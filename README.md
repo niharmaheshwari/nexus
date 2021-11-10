@@ -4,6 +4,7 @@
 1. [About](#1-about)
 2. [Team](#2-team)
 4. [Issues](#3-issues)
+5. [Setup](#4-setup)
 
 ___
 
