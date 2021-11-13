@@ -7,11 +7,12 @@ class Snippet():
     Attributes:
         uri         : S3 uri indicating the file location
         desc        : A user description for a code snippet
-        snippet_id  : A hex string representing a unique snippet_id for a snippet
+        id          : A hex string representing a unique id for a snippet
         tags        : A list of instances of the Tag class
-        creator     : A string representing the user_snippet_id of the uploader
-        shares      : A list of user_snippet_ids representing the share list
+        author      : A string representing the user_id of the uploader
+        shares      : A list of user_ids representing the share list
         audit       : An instance of the audit class giving the latest audit
+        lang        : The language tag of the snippet
     '''
 
     def __init__(self):
@@ -20,9 +21,9 @@ class Snippet():
         '''
         self._uri = None
         self._desc = None
-        self._snippet_id = None
+        self._id = None
         self._tags = None
-        self._creator = None
+        self._author = None
         self._shares = None
         self._audit = None
 
@@ -45,13 +46,13 @@ class Snippet():
         self._desc = value
 
     @property
-    def snippet_id(self):
-        '''Getter for snippet_id'''
-        return self._snippet_id
+    def id(self):
+        '''Getter for id'''
+        return self._id
 
-    @snippet_id.setter
-    def snippet_id(self, value):
-        self._snippet_id = value
+    @id.setter
+    def id(self, value):
+        self._id = value
 
     @property
     def tags(self):
@@ -63,13 +64,13 @@ class Snippet():
         self._tags = value
 
     @property
-    def creator(self):
-        '''Getter for creator'''
-        return self._creator
+    def author(self):
+        '''Getter for author'''
+        return self._author
 
-    @creator.setter
-    def creator(self, value):
-        self._creator = value
+    @author.setter
+    def author(self, value):
+        self._author = value
 
     @property
     def audit(self):
@@ -79,3 +80,12 @@ class Snippet():
     @audit.setter
     def audit(self, value):
         self._audit = value
+
+    @property
+    def lang(self):
+        '''Getter for lang'''
+        return self._lang
+
+    @lang.setter
+    def lang(self, value):
+        self._lang = value
