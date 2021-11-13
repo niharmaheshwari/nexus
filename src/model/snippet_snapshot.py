@@ -5,17 +5,17 @@ class SnippetSnapshot():
     '''
     Class definition to represent the minified view of the Snippet
     Attributes
-        snippet_id  : A hex string representing a unique snippet_id for a snippet
-        creator     : A string representing the user_snippet_id of the uploader
+        id  : A hex string representing a unique id for a snippet
         tags        : A list of instances of the Tag class
         desc        : A user description for a code snippet
+        lang        : The language tag of the snippet
     '''
 
     def __init__(self):
-        self._snippet_id = None
-        self._creator = None
+        self._id = None
         self._tags = None
         self._desc = None
+        self._lang = None
 
     @property
     def desc(self):
@@ -27,13 +27,13 @@ class SnippetSnapshot():
         self._desc = value
 
     @property
-    def snippet_id(self):
-        '''Getter for snippet_id'''
-        return self._snippet_id
+    def id(self):
+        '''Getter for id'''
+        return self._id
 
-    @snippet_id.setter
-    def snippet_id(self, value):
-        self._snippet_id = value
+    @id.setter
+    def id(self, value):
+        self._id = value
 
     @property
     def tags(self):
@@ -45,10 +45,10 @@ class SnippetSnapshot():
         self._tags = value
 
     @property
-    def creator(self):
-        '''Getter for creator'''
-        return self._creator
+    def lang(self):
+        '''Getter for lang'''
+        return self._lang
 
-    @creator.setter
-    def creator(self, value):
-        self._creator = value
+    @lang.setter
+    def lang(self, value):
+        self._lang = value
