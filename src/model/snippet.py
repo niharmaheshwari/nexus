@@ -8,7 +8,7 @@ class Snippet():
         uri         : S3 uri indicating the file location
         desc        : A user description for a code snippet
         id          : A hex string representing a unique id for a snippet
-        tags        : A list of instances of the Tag class
+        tags        : A list of Strings representing the Snippet tags
         author      : A string representing the user_id of the uploader
         shares      : A list of user_ids representing the share list
         audit       : An instance of the audit class giving the latest audit
