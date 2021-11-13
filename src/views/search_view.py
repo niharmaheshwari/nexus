@@ -21,13 +21,12 @@ def search_tag():
     user = 'fake_user'
     snippet_snapshots = search_manager.search_by_tags(tags, user)
 
-    rsp = []
 
-    # TODO: maybe have a method in snippet manager that allows you to get many snippets by a list of IDs?
+    ids = []
     for snapshot in snippet_snapshots: 
-        id = snapshot.snippet_id()
-        snippet = snippet_manager.get_sinppet(id)
-        rsp.append(snippet)
+        ids.append(snapshot.snippet_id())
+    
+    snippets = snippet_manager.get_snippets(ids)
     
     # TODO: serialize array of snippets to json, return it? Figure out format we want for response
     # TODO: error handling

@@ -27,6 +27,7 @@ class SearchManager():
             Returns: list of snippetSnapshots
 
         '''
+        # TODO: should also search lang
         query = {"query" : {
                 "terms" : {
                     "tags.keyword" : tags
@@ -50,14 +51,14 @@ class SearchManager():
 
             Inputs: search_string = "python code that searches a list quickly"
                     user = example 'user2' 
-            Returns: list of snippetSnapshots that match the search_string 
+            Returns: list of snippetSnapshots that match the search_string in either tags, desc, or lang fields
         '''
 
         #TODO: do we want this to be fuzzy? 
         query = {"query" : {
                 "multi_match" : {
                     "query": search_string,
-                    "fields": ["tags", "desc"]
+                    "fields": ["tags", "desc", "lang"]
                 }
             }
         }
@@ -66,10 +67,30 @@ class SearchManager():
             body = query,
             index = user
         )
-
-        # TODO: deserialize the response into an array of snippetSnapshots
-        return response['hits']['hits']
-
+        # TODO: break this up into multiple functions...should it be the managers job to change to object too? 
+        # deserialize the response into an array of snippetSnapshots
+        result = response['hits']['hits']
+        snippet_list = []
+        for item in result:
+            s = SnippetSnapshot()
+            s.id(item['_source']['id'])
+            s.desc(item['_source']['desc'])
+            s.tags(item['_source']['tags'])
+            s.lang(item['_source']['lang'])
+            snippet_list.append(s)
+        
+        return snippet_list
     
+s = SearchManager()
+r = s.search_by_string("python", "user1")
+print(r)
+print(type(r))
 
-                
+'''
+Example output
+type list
+[{'_index': 'user1', '_type': 'snippet', '_id': 'NF5GB30BlIp4drDQ_cXV', '_score': 0.2876821, '_source': 
+{'snippet_id': 'user1-snippit-2', 'tags': ['python', 'quick sort'], 'desc': ['randomized quick sort']}}, 
+{'_index': 'user1', '_type': 'snippet', '_id': 'M15GB30BlIp4drDQ_MUz', '_score': 0.2876821, '_source': 
+{'snippet_id': 'user1-snippit-1', 'tags': ['python', 'binary search'], 'desc': ['perform binary search']}}]
+'''
