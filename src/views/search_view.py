@@ -1,29 +1,31 @@
 '''Search View'''
 import json
-from flask import (jsonify, Blueprint, request)
+from flask import (Blueprint, request)
 from flask.wrappers import Response
-from manager.search_manager import SearchManager
-from manager.snippet_manager import SnippetManager
+from src.manager.search_manager import SearchManager
+from src.manager.snippet_manager import SnippetManager
 
 search = Blueprint('search', __name__, url_prefix='/search')
 
 @search.route('/tags', methods=['POST'])
 def search_tag():
-    '''The body will be a json object {tags: ["python", "binary_search"]}'''
-    '''Exact matches for the tags will be searched for'''
+    '''
+    The body will be a json object {tags: ["python", "binary_search"]}
+    Exact matches for the tags will be searched for
+    '''
 
     tags = request.json['tags']
     search_manager = SearchManager()
     snippet_manager = SnippetManager()
 
-    # TODO : update getting the user to a real function call 
+    # TODO : update getting the user to a real function call
     user = 'user2'
     snippet_snapshots = search_manager.search_by_tags(tags, user)
 
     ids = []
-    for snapshot in snippet_snapshots: 
+    for snapshot in snippet_snapshots:
         ids.append(snapshot.snippet_id())
-    
+
     snippets = snippet_manager.get_snippets(ids)
 
     results = json.dumps({"snippets":snippets},cls=MyEncoder)
@@ -43,33 +45,30 @@ def search_general():
     search_manager = SearchManager()
     snippet_manager = SnippetManager()
 
-    # TODO : update getting the user with real function call 
+    # TODO : update getting the user with real function call
     user = 'user2'
 
-    '''Search es for the SnippetSnapshots corresponding to search string'''
+    # Search es for the SnippetSnapshots corresponding to search string
     snippet_snapshots = search_manager.search_by_string(search_string, user)
 
-    '''Extract IDs from SnippetSnapshots'''
+    # Extract IDs from SnippetSnapshots
     ids = []
-    for snapshot in snippet_snapshots: 
+    for snapshot in snippet_snapshots:
         ids.append(snapshot.id)
-    
-    '''Search dynamo for list of Snippets'''
+
+    # Search dynamo for list of Snippets
     snippets = snippet_manager.get_snippets(ids)
 
-    '''Serialize Snippets to JSON'''
+    # Serialize Snippets to JSON
     results = json.dumps({"snippets":snippets},cls=MyEncoder)
 
     return Response(results, status=200, content_type="application/json")
-    
+
     # TODO: error handling
 
 class MyEncoder(json.JSONEncoder):
+    '''
+    Encoder for Snippets: removes prefix '_' for attributes
+    '''
     def default(self, o):
         return {k.lstrip('_'): v for k, v in vars(o).items()}
-
-
-
-
-
-

@@ -1,9 +1,8 @@
 import boto3
-from pprint import pprint
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
-import manager.constants as constants
-from model.snippet_snapshot import SnippetSnapshot
+from src.manager import constants
+from src.model.snippet_snapshot import SnippetSnapshot
 
 class SearchManager():
 
@@ -27,8 +26,8 @@ class SearchManager():
         Inputs: tags = Array of strings . example ['python', 'binary search']
                 user = example 'user1' 
         Returns: list of snippetSnapshots
-
         '''
+        
         # TODO: should also search lang? 
         '''build search query for es'''
         query = {"query" : {
