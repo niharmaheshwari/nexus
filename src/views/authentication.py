@@ -2,24 +2,25 @@
 Views for authentication APIs
 """
 import logging
-from flask import Flask, request, jsonify
+from flask import request, jsonify, Blueprint
 from src.manager.user_manager import UserManager
 from src.model.message_format import MessageFormat
 from src.utilities.authentication_utils import serialize_user_object
 
-app = Flask(__name__)
 log = logging.getLogger(__name__)
 log.setLevel(logging.ERROR)
 MANAGER = UserManager()
 
-@app.route('/', methods=['GET'])
+auth = Blueprint('auth', __name__, url_prefix='/auth')
+
+@auth.route('/', methods=['GET'])
 def init():
     """
     Initialization API call
     """
     return jsonify("Hello World")
 
-@app.route('/signup', methods=["POST"])
+@auth.route('/signup', methods=["POST"])
 def user_signup():
     """
     Allows user to signup and register
@@ -27,7 +28,7 @@ def user_signup():
     request_body = request.get_json()
     return jsonify(MANAGER.signup(request_body))
 
-@app.route('/confirm-signup', methods=["POST"])
+@auth.route('/confirm-signup', methods=["POST"])
 def user_confirm_signup():
     """
     Confirms user signup with the verification code
@@ -37,7 +38,7 @@ def user_confirm_signup():
     code = request_body["code"]
     return jsonify(MANAGER.confirm_signup(email, code))
 
-@app.route('/login', methods=["POST"])
+@auth.route('/login', methods=["POST"])
 def user_login():
     """
     Logs in the user and returns session details
@@ -45,7 +46,7 @@ def user_login():
     request_body = request.get_json()
     return jsonify(MANAGER.login(request_body))
 
-@app.route('/refresh-token', methods=["POST"])
+@auth.route('/refresh-token', methods=["POST"])
 def refresh_token():
     """
     Generates new session id and access tokens
@@ -53,7 +54,7 @@ def refresh_token():
     request_body = request.get_json()
     return jsonify(MANAGER.generate_new_token(request_body))
 
-@app.route('/get-user', methods=["POST"])
+@auth.route('/get-user', methods=["POST"])
 def get_user_details():
     """
     Fetches user attributes
@@ -67,6 +68,3 @@ def get_user_details():
         return jsonify(MessageFormat().success_message(\
                     data=user_details))
     return jsonify(response)
-
-if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1')
