@@ -1,3 +1,6 @@
 # git message template
 .gitmessage
 .vscode
+.idea
+src/constants/secrets.py
+__pycache__/

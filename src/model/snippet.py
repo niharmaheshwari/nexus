@@ -28,6 +28,28 @@ class Snippet():
         self._audit = None
         self._lang = None
 
+    def __init__(self, uri, desc, id, tags, author, shares, audit, lang):
+        """
+        Initialize an object of Snippet
+        Args:
+            uri         : S3 uri indicating the file location
+            desc        : A user description for a code snippet
+            id          : A hex string representing a unique id for a snippet
+            tags        : A list of Strings representing the Snippet tags
+            author      : A string representing the user_id of the uploader
+            shares      : A list of user_ids representing the share list
+            audit       : An instance of the audit class giving the latest audit
+            lang        : The language tag of the snippet
+        """
+        self._uri = uri
+        self._desc = desc
+        self._id = id
+        self._tags = tags
+        self._author = author
+        self._shares = shares
+        self._audit = audit
+        self._lang = lang
+
     @property
     def uri(self):
         '''Getter for uri'''
