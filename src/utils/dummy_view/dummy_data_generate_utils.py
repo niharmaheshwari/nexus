@@ -7,19 +7,23 @@ from src.utils.utils import convert_to_dict
 from src.model.snippet_snapshot import SnippetSnapshot
 
 SERVICE = "es"
-creds = boto3.Session(ACCESS_KEY, SECRET_KEY, region_name=AWS_REGION).get_credentials()
-
-awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION, SERVICE, session_token=creds.token)
 
 
-es = OpenSearch([ELASTIC_SEARCH],
-                http_auth=awsauth,
-                use_ssl=True,
-                verify_certs=True,
-                connection_class=RequestsHttpConnection)
+def create_es_session():
+    creds = boto3.Session(ACCESS_KEY, SECRET_KEY, region_name=AWS_REGION).get_credentials()
+
+    awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION, SERVICE, session_token=creds.token)
+
+    es = OpenSearch([ELASTIC_SEARCH],
+                    http_auth=awsauth,
+                    use_ssl=True,
+                    verify_certs=True,
+                    connection_class=RequestsHttpConnection)
+    return es
 
 
 def populate_elastic_search():
+    es = create_es_session()
     # User 1
     user1_snippet_1 = SnippetSnapshot(
         "user1-snippit-1",
@@ -69,5 +73,3 @@ def populate_elastic_search():
     print(res1)
     print(res2)
     print(res3)
-
-
