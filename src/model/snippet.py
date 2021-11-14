@@ -26,6 +26,7 @@ class Snippet():
         self._author = None
         self._shares = None
         self._audit = None
+        self._lang = None
 
     @property
     def uri(self):
