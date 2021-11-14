@@ -5,6 +5,7 @@ from    flask              import Flask
 from    views.snippet_view import snippet
 from    views.test_view    import test
 from    views.search_view  import search
+from views.dummy_view import dummy
 
 # Global APP Name
 NAME = 'NEXUS'
@@ -36,6 +37,7 @@ def register():
     app.register_blueprint(snippet)
     app.register_blueprint(test)
     app.register_blueprint(search)
+    app.register_blueprint(dummy)
     return app
 
 def init_log(log_level = logging.INFO):

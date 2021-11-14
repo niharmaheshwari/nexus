@@ -4,6 +4,7 @@ from flask import (Blueprint, request)
 from flask.wrappers import Response
 from src.manager.search_manager import SearchManager
 from src.manager.snippet_manager import SnippetManager
+from src.utils.utils import CustomJSONEncoder
 
 search = Blueprint('search', __name__, url_prefix='/search')
 
@@ -28,7 +29,7 @@ def search_tag():
 
     snippets = snippet_manager.get_snippets(ids)
 
-    results = json.dumps({"snippets":snippets},cls=MyEncoder)
+    results = json.dumps({"snippets":snippets},cls=CustomJSONEncoder)
 
     return Response(results, status=200, content_type="application/json")
 
@@ -60,15 +61,8 @@ def search_general():
     snippets = snippet_manager.get_snippets(ids)
 
     # Serialize Snippets to JSON
-    results = json.dumps({"snippets":snippets},cls=MyEncoder)
+    results = json.dumps({"snippets":snippets},cls=CustomJSONEncoder)
 
     return Response(results, status=200, content_type="application/json")
 
     # TODO: error handling
-
-class MyEncoder(json.JSONEncoder):
-    '''
-    Encoder for Snippets: removes prefix '_' for attributes
-    '''
-    def default(self, o):
-        return {k.lstrip('_'): v for k, v in vars(o).items()}
