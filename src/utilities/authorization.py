@@ -22,7 +22,11 @@ def authorization(func):
         authorized or not.
         """
         id_token = args[1]
+<<<<<<< HEAD
         if id_token is None:
+=======
+        if id_token is None or len(id_token) != 1231:
+>>>>>>> 9f88c199bb488cc6e1c03c837400ecddc68b9943
             return MessageFormat().error_message("Token not present/Invalid token.")
         json_web_keys = get_keys()
         headers = jwt.get_unverified_headers(id_token)
