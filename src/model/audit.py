@@ -20,6 +20,20 @@ class Audit():
         self._creation_date = None
         self._creation_user = None
 
+    def __init__(self, last_upd_date, last_upd_user, creation_date, creation_user):
+        """
+
+        Args:
+            last_upd_date   : Last Updated Date for a Snippet
+            last_upd_user   : Username of the user who performed the last touch on the Snippet
+            creation_date   : Creation Date for a Snippet
+            creation_user   : Username of the user who created the Snippet
+        """
+        self._last_upd_date = last_upd_date
+        self._last_upd_user = last_upd_user
+        self._creation_date = creation_date
+        self._creation_user = creation_user
+
     @property
     def last_upd_date(self):
         '''Getter for last_upd_date'''
