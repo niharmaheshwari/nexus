@@ -14,7 +14,6 @@ class User:
         self.email = None
 
     # getter and setter methods for the model
-<<<<<<< HEAD
     def set_user_id(self, uid):
         """
         Setter for uid
@@ -28,8 +27,6 @@ class User:
         return self.uid
 
 
-=======
->>>>>>> 9f88c199bb488cc6e1c03c837400ecddc68b9943
     def set_name(self, name):
         """
         Setter for name

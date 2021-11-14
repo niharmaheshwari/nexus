@@ -6,7 +6,6 @@ import hmac
 import hashlib
 import base64
 import json
-<<<<<<< HEAD
 import time
 from urllib import request
 from jose.utils import base64url_decode
@@ -20,17 +19,6 @@ def get_hashcode(username):
         username: str, email address of the user
     :returns:
         string, unique hashcode for the user
-=======
-import logging
-import time
-from urllib import request
-from jose.utils import base64url_decode
-from src.constants.cognito_constants import *
-
-def get_hashcode(username):
-    """
-    returns hashcode generated from username
->>>>>>> 9f88c199bb488cc6e1c03c837400ecddc68b9943
     """
     msg = username + CLIENT_ID
     encoded_msg = hmac.new(str(CLIENT_SECRET).encode('utf-8'),
@@ -42,7 +30,6 @@ def get_keys():
     """
     Fetch keys from cognito url
     """
-<<<<<<< HEAD
     with request.urlopen(KEYS_URL) as file_descriptor:
         data = file_descriptor.read()
     return json.loads(data.decode('utf-8'))['keys']
@@ -59,22 +46,12 @@ def find_public_key(key_id, key_list):
     """
     key_index = -1
     for idx, _ in enumerate(key_list):
-=======
-    with request.urlopen(KEYS_URL) as fd:
-        data = fd.read()
-    return json.loads(data.decode('utf-8'))['keys']
-
-def find_public_key(key_id, key_list):
-    key_index = -1
-    for idx in range(len(key_list)):
->>>>>>> 9f88c199bb488cc6e1c03c837400ecddc68b9943
         if key_id == key_list[idx]["kid"]:
             key_index = idx
             break
     return key_index
 
 def verify_public_key(token, public_key):
-<<<<<<< HEAD
     """
     Verifies whether the token and public key matches the ones stored
     in cognito
@@ -84,8 +61,6 @@ def verify_public_key(token, public_key):
     :returns:
         bool, whether the verification is successful or not
     """
-=======
->>>>>>> 9f88c199bb488cc6e1c03c837400ecddc68b9943
     # fetch the payload and signature from the token
     payload, base64_signature = str(token).rsplit('.', 1)
     # decode signature
@@ -94,7 +69,6 @@ def verify_public_key(token, public_key):
     return public_key.verify(payload.encode("utf-8"), decoded_signature)
 
 def is_token_expired(claims):
-<<<<<<< HEAD
     """
     Checks whether the session id_token has expired
     :params:
@@ -151,9 +125,3 @@ def deserialize_user_object(user_details):
         if field["Name"] in user_setter_handlers:
             user_setter_handlers[field["Name"]](field["Value"])
     return user
-=======
-    return time.time() > claims['exp']
-
-def is_audience_valid(claims):
-    return claims['aud'] == CLIENT_ID
->>>>>>> 9f88c199bb488cc6e1c03c837400ecddc68b9943
