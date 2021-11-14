@@ -4,6 +4,7 @@ import  argparse
 from    flask              import Flask
 from    views.snippet_view import snippet
 from    views.test_view    import test
+from    views.search_view  import search
 
 # Global APP Name
 NAME = 'NEXUS'
@@ -34,6 +35,7 @@ def register():
     app = Flask(NAME)
     app.register_blueprint(snippet)
     app.register_blueprint(test)
+    app.register_blueprint(search)
     return app
 
 def init_log(log_level = logging.INFO):

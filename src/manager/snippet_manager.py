@@ -2,6 +2,12 @@
 Snippet Manager
 '''
 import boto3
+from pprint import pprint
+
+from model.snippet import Snippet
+from model.audit import Audit
+from views.snippet_view import snippet_ops
+import manager.constants as constants
 
 class SnippetManager():
     '''
@@ -12,7 +18,7 @@ class SnippetManager():
         '''
         Restrict s3 client and table. These should be initialized once and not modified
         '''
-        self._db_client = boto3.resource('dynamodb', aws_access_key_id="AKIAVYPI7GZ6X3S4WW6Y", aws_secret_access_key="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",region_name='us-east-2')
+        self._db_client = boto3.resource('dynamodb', aws_access_key_id= constants.ACCESS_KEY, aws_secret_access_key=constants.SECRET_KEY,region_name=constants.REGION)
         self._table = self._db_client.Table('snippets')
 
     @property
@@ -57,22 +63,45 @@ class SnippetManager():
             list of Snippets
         
         '''
+        # TODO : error handling 
+
+        '''Search snippets table for multiple ids'''
         batch_keys = {
         self._table.name: {
         'Keys': [{'id': id} for id in snippet_ids]
         }}
 
-        response = self._db_client.batch_get_item(RequestItems=batch_keys)['Responses']['snippets']
-        #TODO: change this to a list of snippets and return the response?
-        '''
-        [{'file': 's3-url', 'user_shared': [], 'audit': {'created_at': '2021-11-09 21:36:31.497460', 'last_update': '2021-11-09 21:36:31.497443'}, 
-        'id': 'user2-snippit-1', 'tags': ['python', 'binary search'], 'author': 'user2', 'desc': ['find upper bound using binary search']}, 
-        {'file': 's3-url', 'user_shared': [], 'audit': {'created_at': '2021-11-12 13:49:57.204840', 'last_update': '2021-11-12 13:49:57.204829'}, 
-        'id': 'user1-snippit-4', 'tags': ['python', 'binary search'], 'author': 'user1', 'desc': ['perform binary search']}]
-        '''
+        response = self._db_client.batch_get_item(RequestItems=batch_keys)
 
+        '''return a list of Snippets'''
+        return self.dynamo_response_to_snippets(response)
 
-       
-    
-s = SnippetManager()
-print(s.get_snippets(['user1-snippit-4','user2-snippit-1']))
+    def dynamo_response_to_snippets(self, response):
+        '''
+        deserialize the dynamo response to a list of Snippets
+        '''
+        json_snippets_list = response['Responses']['snippets']
+        snippets_list = []
+        for item in json_snippets_list: 
+            a = Audit()
+            s = Snippet()
+            audit = item['audit']
+
+            a.last_upd_user = audit['last_upd_user']
+            a.creation_date = audit['creation_date']
+            a.last_upd_date = audit['last_upd_date']
+            a.creation_user = audit['creation_user']
+
+            s.audit = audit
+            s.uri = item['uri']
+            s.id = item['id']
+            s.tags = item['tags']
+            s.shares = item['shares']
+            s.author = item['author']
+            s.lang = item['lang']
+            s.desc = item['desc']
+
+            snippets_list.append(s)
+        
+        return snippets_list
+
