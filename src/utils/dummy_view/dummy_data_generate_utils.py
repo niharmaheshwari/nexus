@@ -1,15 +1,17 @@
 from opensearchpy import OpenSearch, RequestsHttpConnection
 import boto3
 from src.constants.secrets import ACCESS_KEY, SECRET_KEY
-from src.constants.constants import ELASTIC_SEARCH, AWS_REGION
+from src.constants.constants import ELASTIC_SEARCH, AWS_REGION, SNIPPET_TABLE
 from requests_aws4auth import AWS4Auth
 from src.utils.utils import convert_to_dict
 from src.model.snippet_snapshot import SnippetSnapshot
-
-SERVICE = "es"
+from src.model.snippet import Snippet
+from src.model.audit import Audit
+import datetime
 
 
 def create_es_session():
+    SERVICE = "es"
     creds = boto3.Session(ACCESS_KEY, SECRET_KEY, region_name=AWS_REGION).get_credentials()
 
     awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION, SERVICE, session_token=creds.token)
@@ -20,6 +22,17 @@ def create_es_session():
                     verify_certs=True,
                     connection_class=RequestsHttpConnection)
     return es
+
+
+def create_dynamo_session():
+    SERVICE = "dynamodb"
+    session = boto3.Session(
+        aws_access_key_id=ACCESS_KEY,
+        aws_secret_access_key=SECRET_KEY,
+        region_name=AWS_REGION
+    )
+    dynamodb = session.resource(SERVICE, region_name=AWS_REGION)
+    return dynamodb
 
 
 def populate_elastic_search():
@@ -73,3 +86,63 @@ def populate_elastic_search():
     print(res1)
     print(res2)
     print(res3)
+
+
+def populate_dynamo_db():
+    dynamodb = create_dynamo_session()
+    table = dynamodb.Table(SNIPPET_TABLE)
+
+    user1_snippet1 = Snippet("s3-url",
+                             "perform binary search",
+                             "user1-snippit-1",
+                             ["binary search"],
+                             "user1",
+                             [],
+                             Audit(str(datetime.datetime.now()), "user1", str(datetime.datetime.now()), "user1"),
+                             "c++")
+
+    user1_snippet2 = Snippet("s3-url",
+                             "randomized quick sort",
+                             "user1-snippit-2",
+                             ["quick sort"],
+                             "user1",
+                             [],
+                             Audit(str(datetime.datetime.now()), "user1", str(datetime.datetime.now()), "user1"),
+                             "python")
+    user2_snippet1 = Snippet("s3-url",
+                             "find upper bound using binary search",
+                             "user2-snippit-1",
+                             ["binary search"],
+                             "user2",
+                             [],
+                             Audit(str(datetime.datetime.now()), "user2", str(datetime.datetime.now()), "user2"),
+                             "c++")
+
+    user2_snippet2 = Snippet("s3-url",
+                             "quick sort with pivot",
+                             "user2-snippit-2",
+                             ["quick sort"],
+                             "user2",
+                             [],
+                             Audit(str(datetime.datetime.now()), "user2", str(datetime.datetime.now()), "user2"),
+                             "java")
+
+    user2_snippet3 = Snippet("s3-url",
+                             "find lower bound using binary search",
+                             "user2-snippit-3",
+                             ["binary search"],
+                             "user2",
+                             [],
+                             Audit(str(datetime.datetime.now()), "user2", str(datetime.datetime.now()), "user2"),
+                             "python")
+
+    res1 = table.put_item(Item=convert_to_dict(user1_snippet1))
+    res2 = table.put_item(Item=convert_to_dict(user1_snippet2))
+    res3 = table.put_item(Item=convert_to_dict(user2_snippet1))
+    res4 = table.put_item(Item=convert_to_dict(user2_snippet2))
+    res5 = table.put_item(Item=convert_to_dict(user2_snippet3))
+    print(res1)
+    print(res2)
+    print(res3)
+    print(res4)
+    print(res5)
