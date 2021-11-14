@@ -1,16 +1,15 @@
 from opensearchpy import OpenSearch, RequestsHttpConnection
 import boto3
 from src.constants.secrets import ACCESS_KEY, SECRET_KEY
-from src.constants.constants import ELASTIC_SEARCH
+from src.constants.constants import ELASTIC_SEARCH, AWS_REGION
 from requests_aws4auth import AWS4Auth
 from src.utils.utils import convert_to_dict
 from src.model.snippet_snapshot import SnippetSnapshot
 
-REGION = "us-east-2"
 SERVICE = "es"
-creds = boto3.Session(ACCESS_KEY, SECRET_KEY, region_name=REGION).get_credentials()
+creds = boto3.Session(ACCESS_KEY, SECRET_KEY, region_name=AWS_REGION).get_credentials()
 
-awsauth = AWS4Auth(creds.access_key, creds.secret_key, REGION, SERVICE, session_token=creds.token)
+awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION, SERVICE, session_token=creds.token)
 
 
 es = OpenSearch([ELASTIC_SEARCH],
