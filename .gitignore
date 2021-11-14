@@ -1,2 +1,13 @@
 # git message template
 .gitmessage
+
+# DS-Store
+**/.DS_Store
+
+# __init__.py
+**/__init__.py
+
+# vscode 
+**/extensions.json
+**/settings.json
+**/.vscode
