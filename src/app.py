@@ -5,6 +5,7 @@ from    flask              import Flask
 from    src.views.snippet_view import snippet
 from    src.views.test_view    import test
 from    src.views.authentication import auth
+from    src.views.dummy_view import dummy
 
 # Global APP Name
 NAME = 'NEXUS'
@@ -36,6 +37,7 @@ def register():
     app.register_blueprint(snippet)
     app.register_blueprint(test)
     app.register_blueprint(auth)
+    app.register_blueprint(dummy)
     return app
 
 def init_log(log_level = logging.INFO):

@@ -11,3 +11,12 @@
 **/extensions.json
 **/settings.json
 **/.vscode
+
+# idea
+**/.idea
+
+# pycache
+**/__pycache__
+
+# misc
+src/constants/secrets.py
