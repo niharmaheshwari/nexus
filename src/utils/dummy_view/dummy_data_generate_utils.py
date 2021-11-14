@@ -1,42 +1,61 @@
+"""Utils to generate dummy data for elastic search and dynamo db"""
+import datetime
 from opensearchpy import OpenSearch, RequestsHttpConnection
 import boto3
+from requests_aws4auth import AWS4Auth
 from src.constants.secrets import ACCESS_KEY, SECRET_KEY
 from src.constants.constants import ELASTIC_SEARCH, AWS_REGION, SNIPPET_TABLE
-from requests_aws4auth import AWS4Auth
 from src.utils.utils import convert_to_dict
 from src.model.snippet_snapshot import SnippetSnapshot
 from src.model.snippet import Snippet
 from src.model.audit import Audit
-import datetime
 
 
 def create_es_session():
-    SERVICE = "es"
-    creds = boto3.Session(ACCESS_KEY, SECRET_KEY, region_name=AWS_REGION).get_credentials()
+    """
+    Generate elastic search session
+    Returns: ES session object
 
-    awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION, SERVICE, session_token=creds.token)
+    """
+    service = "es"
+    creds = boto3.Session(ACCESS_KEY,
+                          SECRET_KEY,
+                          region_name=AWS_REGION).get_credentials()
 
-    es = OpenSearch([ELASTIC_SEARCH],
+    awsauth = AWS4Auth(creds.access_key,
+                       creds.secret_key,
+                       AWS_REGION,
+                       service,
+                       session_token=creds.token)
+
+    return OpenSearch([ELASTIC_SEARCH],
                     http_auth=awsauth,
                     use_ssl=True,
                     verify_certs=True,
                     connection_class=RequestsHttpConnection)
-    return es
 
 
 def create_dynamo_session():
-    SERVICE = "dynamodb"
+    """
+    Generate dynamodb session
+    Returns: DynamoDB session object
+
+    """
+    service = "dynamodb"
     session = boto3.Session(
         aws_access_key_id=ACCESS_KEY,
         aws_secret_access_key=SECRET_KEY,
         region_name=AWS_REGION
     )
-    dynamodb = session.resource(SERVICE, region_name=AWS_REGION)
+    dynamodb = session.resource(service, region_name=AWS_REGION)
     return dynamodb
 
 
 def populate_elastic_search():
-    es = create_es_session()
+    """
+    Generate random elastic search data
+    """
+    elastic = create_es_session()
     # User 1
     user1_snippet_1 = SnippetSnapshot(
         "user1-snippit-1",
@@ -51,8 +70,8 @@ def populate_elastic_search():
         "python"
     )
 
-    res1 = es.index(index="user1", doc_type='snippet', body=convert_to_dict(user1_snippet_1))
-    res2 = es.index(index="user1", doc_type='snippet', body=convert_to_dict(user1_snippet_2))
+    res1 = elastic.index(index="user1", doc_type='snippet', body=convert_to_dict(user1_snippet_1))
+    res2 = elastic.index(index="user1", doc_type='snippet', body=convert_to_dict(user1_snippet_2))
 
     print(res1)
     print(res2)
@@ -79,9 +98,9 @@ def populate_elastic_search():
         "python"
     )
 
-    res1 = es.index(index="user2", doc_type='snippet', body=convert_to_dict(user2_snippet_1))
-    res2 = es.index(index="user2", doc_type='snippet', body=convert_to_dict(user2_snippet_2))
-    res3 = es.index(index="user2", doc_type='snippet', body=convert_to_dict(user2_snippet_3))
+    res1 = elastic.index(index="user2", doc_type='snippet', body=convert_to_dict(user2_snippet_1))
+    res2 = elastic.index(index="user2", doc_type='snippet', body=convert_to_dict(user2_snippet_2))
+    res3 = elastic.index(index="user2", doc_type='snippet', body=convert_to_dict(user2_snippet_3))
 
     print(res1)
     print(res2)
@@ -89,6 +108,9 @@ def populate_elastic_search():
 
 
 def populate_dynamo_db():
+    """
+    Generate dynamodb data
+    """
     dynamodb = create_dynamo_session()
     table = dynamodb.Table(SNIPPET_TABLE)
 
@@ -98,7 +120,10 @@ def populate_dynamo_db():
                              ["binary search"],
                              "user1",
                              [],
-                             Audit(str(datetime.datetime.now()), "user1", str(datetime.datetime.now()), "user1"),
+                             Audit(str(datetime.datetime.now()),
+                                   "user1",
+                                   str(datetime.datetime.now()),
+                                   "user1"),
                              "c++")
 
     user1_snippet2 = Snippet("s3-url",
@@ -107,7 +132,10 @@ def populate_dynamo_db():
                              ["quick sort"],
                              "user1",
                              [],
-                             Audit(str(datetime.datetime.now()), "user1", str(datetime.datetime.now()), "user1"),
+                             Audit(str(datetime.datetime.now()),
+                                   "user1",
+                                   str(datetime.datetime.now()),
+                                   "user1"),
                              "python")
     user2_snippet1 = Snippet("s3-url",
                              "find upper bound using binary search",
@@ -115,7 +143,10 @@ def populate_dynamo_db():
                              ["binary search"],
                              "user2",
                              [],
-                             Audit(str(datetime.datetime.now()), "user2", str(datetime.datetime.now()), "user2"),
+                             Audit(str(datetime.datetime.now()),
+                                   "user2",
+                                   str(datetime.datetime.now()),
+                                   "user2"),
                              "c++")
 
     user2_snippet2 = Snippet("s3-url",
@@ -124,7 +155,10 @@ def populate_dynamo_db():
                              ["quick sort"],
                              "user2",
                              [],
-                             Audit(str(datetime.datetime.now()), "user2", str(datetime.datetime.now()), "user2"),
+                             Audit(str(datetime.datetime.now()),
+                                   "user2",
+                                   str(datetime.datetime.now()),
+                                   "user2"),
                              "java")
 
     user2_snippet3 = Snippet("s3-url",
@@ -133,7 +167,10 @@ def populate_dynamo_db():
                              ["binary search"],
                              "user2",
                              [],
-                             Audit(str(datetime.datetime.now()), "user2", str(datetime.datetime.now()), "user2"),
+                             Audit(str(datetime.datetime.now()),
+                                   "user2",
+                                   str(datetime.datetime.now()),
+                                   "user2"),
                              "python")
 
     res1 = table.put_item(Item=convert_to_dict(user1_snippet1))
