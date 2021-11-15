@@ -21,7 +21,7 @@ class UserManager():
         """
         Init class for initializing the cognito client
         """
-        self._cognito_client = boto3.client(
+        self.cognito_client = boto3.client(
             "cognito-idp",
             aws_access_key_id=ACCESS_KEY,
             aws_secret_access_key=SECRET_ACCESS_KEY,
@@ -50,7 +50,7 @@ class UserManager():
 
         # use cognito sdk for signing up
         try:
-            self._cognito_client.sign_up(
+            self.cognito_client.sign_up(
                 ClientId=CLIENT_ID,
                 SecretHash=get_hashcode(email),
                 Username=email,
@@ -58,12 +58,12 @@ class UserManager():
                 UserAttributes=user_attributes,
                 ValidationData=[{"Name": "email", "Value": email}]
             )
-        except self._cognito_client.exceptions.UsernameExistsException:
+        except self.cognito_client.exceptions.UsernameExistsException:
             return MessageFormat().error_message("This username already exists")
-        except self._cognito_client.exceptions.InvalidPasswordException:
+        except self.cognito_client.exceptions.InvalidPasswordException:
             return MessageFormat().error_message("Password should have Caps, \
-                                                    Special chars, Numbers")
-        except self._cognito_client.exceptions.UserLambdaValidationException:
+                Special chars, Numbers")
+        except self.cognito_client.exceptions.UserLambdaValidationException:
             return MessageFormat().error_message("Email already exists")
         except Exception as err:
             return MessageFormat().error_message(str(err))
@@ -80,19 +80,21 @@ class UserManager():
         :returns:
             None
         """
+        if email is None or otp is None:
+            return MessageFormat().error_message("Email/OTP is a required attribute.")
         try:
-            self._cognito_client.confirm_sign_up(
+            self.cognito_client.confirm_sign_up(
                 ClientId=CLIENT_ID,
                 SecretHash=get_hashcode(email),
                 Username=email,
                 ConfirmationCode=otp,
                 ForceAliasCreation=False
             )
-        except self._cognito_client.exceptions.UserNotFoundException:
+        except self.cognito_client.exceptions.UserNotFoundException:
             return MessageFormat().error_message("Username doesnt exists")
-        except self._cognito_client.exceptions.CodeMismatchException:
+        except self.cognito_client.exceptions.CodeMismatchException:
             return MessageFormat().error_message("Invalid Verification code")
-        except self._cognito_client.exceptions.NotAuthorizedException:
+        except self.cognito_client.exceptions.NotAuthorizedException:
             return MessageFormat().error_message("User is already confirmed", status_code=401)
         except Exception as err:
             return MessageFormat().error_message(f"Unknown error: {str(err)}")
@@ -109,7 +111,7 @@ class UserManager():
         """
         secret_hash = get_hashcode(username)
         try:
-            response = self._cognito_client.admin_initiate_auth(
+            response = self.cognito_client.admin_initiate_auth(
                         UserPoolId=USER_POOL_ID,
                         ClientId=CLIENT_ID,
                         AuthFlow='ADMIN_NO_SRP_AUTH',
@@ -122,9 +124,9 @@ class UserManager():
                         'username': username,
                         'password': password,
                     })
-        except self._cognito_client.exceptions.NotAuthorizedException:
+        except self.cognito_client.exceptions.NotAuthorizedException:
             return None, "The username or password is incorrect"
-        except self._cognito_client.exceptions.UserNotConfirmedException:
+        except self.cognito_client.exceptions.UserNotConfirmedException:
             return None, "User is not confirmed"
         except Exception as err:
             return None, err.__str__()
@@ -163,7 +165,7 @@ class UserManager():
         """
         Generates new id_token and access_token from refresh token
         :params:
-            refresh_token_credentials: dictionary, consisting of email and 
+            refresh_token_credentials: dictionary, consisting of email and
             refresh token
         :returns:
             dictionary, new id token and access token for the user
@@ -174,7 +176,7 @@ class UserManager():
         email = refresh_token_details["email"]
         refresh_token = refresh_token_details["refresh_token"]
         try:
-            response = self._cognito_client.initiate_auth(
+            response = self.cognito_client.initiate_auth(
                 AuthParameters={
                     'USERNAME': email,
                     'SECRET_HASH': get_hashcode(email),
@@ -187,14 +189,14 @@ class UserManager():
             if result:
                 data = {
                     "id_token": result["IdToken"],
-                    "access_token": result["AccessToken"], 
+                    "access_token": result["AccessToken"],
                     "expires_in": result["ExpiresIn"],
                     "token_type": result["TokenType"]
                 }
                 return MessageFormat().success_message(data=data)
-        except self._cognito_client.exceptions.NotAuthorizedException:
+        except self.cognito_client.exceptions.NotAuthorizedException:
             return MessageFormat().error_message("Invalid email/token", status_code=401)
-        except self._cognito_client.exceptions.UserNotConfirmedException:
+        except self.cognito_client.exceptions.UserNotConfirmedException:
             return MessageFormat().error_message("User is not confirmed")
         except Exception as err:
             return MessageFormat().error_message(str(err))
@@ -205,18 +207,17 @@ class UserManager():
         for the user
         :params:
             email: str, unique email address for the user
-            token: str, id token for the user
         :returns:
-            dictionary, user details
+            dictionary, with user object
         """
         if email is None:
-            return MessageFormat().error_message("Email and Token are required.")
+            return MessageFormat().error_message("Email is required.")
         try:
-            response = self._cognito_client.admin_get_user(
+            response = self.cognito_client.admin_get_user(
                 UserPoolId=USER_POOL_ID,
                 Username=email
             )
             user = deserialize_user_object(response["UserAttributes"])
             return MessageFormat().success_message(data={"user": user})
-        except self._cognito_client.exceptions.UserNotFoundException:
+        except self.cognito_client.exceptions.UserNotFoundException:
             return MessageFormat().error_message("Invalid username")
