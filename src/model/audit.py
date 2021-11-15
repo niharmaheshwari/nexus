@@ -11,18 +11,8 @@ class Audit():
         creation_user   : Username of the user who created the Snippet
     '''
 
-    def __init__(self):
-        '''
-        This should always initialize an empty audit
-        '''
-        self._last_upd_date = None
-        self._last_upd_user = None
-        self._creation_date = None
-        self._creation_user = None
-
     def __init__(self, last_upd_date, last_upd_user, creation_date, creation_user):
         """
-
         Args:
             last_upd_date   : Last Updated Date for a Snippet
             last_upd_user   : Username of the user who performed the last touch on the Snippet

@@ -1,6 +1,8 @@
 '''
 Snippet Definition
 '''
+import json
+
 class Snippet():
     '''
     Class definition to represent a Snippet.
@@ -27,28 +29,6 @@ class Snippet():
         self._shares = None
         self._audit = None
         self._lang = None
-
-    def __init__(self, uri, desc, id, tags, author, shares, audit, lang):
-        """
-        Initialize an object of Snippet
-        Args:
-            uri         : S3 uri indicating the file location
-            desc        : A user description for a code snippet
-            id          : A hex string representing a unique id for a snippet
-            tags        : A list of Strings representing the Snippet tags
-            author      : A string representing the user_id of the uploader
-            shares      : A list of user_ids representing the share list
-            audit       : An instance of the audit class giving the latest audit
-            lang        : The language tag of the snippet
-        """
-        self._uri = uri
-        self._desc = desc
-        self._id = id
-        self._tags = tags
-        self._author = author
-        self._shares = shares
-        self._audit = audit
-        self._lang = lang
 
     @property
     def uri(self):
@@ -105,15 +85,6 @@ class Snippet():
         self._audit = value
 
     @property
-    def lang(self):
-        '''Getter for lang'''
-        return self._lang
-
-    @lang.setter
-    def lang(self, value):
-        self._lang = value
-    
-    @property
     def shares(self):
         '''Getter for shares'''
         return self._shares
@@ -121,3 +92,44 @@ class Snippet():
     @shares.setter
     def shares(self, value):
         self._shares = value
+
+    @property
+    def lang(self):
+        '''Getter for lang'''
+        return self._lang
+
+    @lang.setter
+    def lang(self, value):
+        self._lang = value
+
+    @staticmethod
+    def to_snippet(ob : dict):
+        '''
+        Try to form the snippet object using as many arguments from the
+        dictionary that comply to the object conversion.
+        '''
+        snippet = Snippet()
+        for key in vars(snippet):
+            if key.lstrip('_') in ob:
+                setattr(snippet, key, ob[key.lstrip('_')])
+        return snippet
+
+    def to_dict(self):
+        '''
+        Returns a serializable dictionary of the snippet object
+        Arguments
+            -
+        '''
+        return {
+            'uri': self.uri,
+            'desc': self.desc,
+            'id': self.id,
+            'tags': self.tags,
+            'author': self.author,
+            'shares': self.shares,
+            'audit': self.audit,
+            'lang': self.lang
+        }
+
+    def __str__(self):
+        return json.dumps(self.to_dict())

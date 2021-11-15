@@ -23,7 +23,7 @@ class SnippetSnapshotManager():
         self._es = OpenSearch([ELASTIC_SEARCH],http_auth=awsauth, use_ssl = True, 
         verify_certs=True, connection_class=RequestsHttpConnection)
 
-    def search_by_string(self, search_string, user) -> list[SnippetSnapshot]:
+    def search_by_string(self, search_string, user) -> list:
         '''
         General search: search through tags and description using a search string
 

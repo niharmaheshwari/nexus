@@ -1,21 +1,17 @@
 '''
 Snippet Snapshot for Elastic
 '''
+import json
+
 class SnippetSnapshot():
     '''
     Class definition to represent the minified view of the Snippet
     Attributes
-        id  : A hex string representing a unique id for a snippet
+        id          : A hex string representing a unique id for a snippet
         tags        : A list of Strings representing the Snippet tags
         desc        : A user description for a code snippet
         lang        : The language tag of the snippet
     '''
-
-    def __init__(self):
-        self._id = None
-        self._tags = None
-        self._desc = None
-        self._lang = None
 
     def __init__(self, snippit_id, tags, desc, lang):
         """
@@ -66,3 +62,19 @@ class SnippetSnapshot():
     @lang.setter
     def lang(self, value):
         self._lang = value
+
+    def to_dict(self):
+        '''
+        Returns a serializable dictionary view of the SnippetSnapshot object
+        Arguments
+            -
+        '''
+        return {
+            'desc': self.desc,
+            'id': self.id,
+            'tags': self.tags,
+            'lang': self.lang
+        }
+
+    def __str__(self):
+        return json.dumps(self.to_dict())
