@@ -7,7 +7,6 @@ import boto3
 from src.constants.cognito_constants import ACCESS_KEY, SECRET_ACCESS_KEY, \
             REGION, USER_POOL_ID, CLIENT_ID
 from src.utilities.authentication_utils import get_hashcode, deserialize_user_object
-from src.utilities.authorization import authorization
 from src.model.message_format import MessageFormat
 
 logger = logging.getLogger(__name__)
@@ -160,35 +159,6 @@ class UserManager():
             return MessageFormat().success_message(data=data)
         return MessageFormat().error_message("Unknown error occured")
 
-    # def authorize_user(self, id_token):
-    #     """
-    #     authorizes user based on id_token
-    #     :params:
-    #         id_token: str, unique session id token for the logged in user
-    #     :returns:
-    #         dictionary, with the user claims object
-    #     """
-    #     json_web_keys = get_keys()
-    #     headers = jwt.get_unverified_headers(id_token)
-    #     jwk_index = find_public_key(headers["kid"], json_web_keys)
-    #     if jwk_index == -1:
-    #         return MessageFormat().error_message("Invalid authorization token.")
-
-    #     # generate public key
-    #     public_key = jwk.construct(json_web_keys[jwk_index])
-    #     # verify public key
-    #     if not verify_public_key(id_token, public_key):
-    #         return MessageFormat().error_message("Signature verification failed.")
-    #     logger.debug("Signature verification was successful.")
-    #     # verify claims -- token expiration and audience
-    #     claims = jwt.get_unverified_claims(id_token)
-    #     if is_token_expired(claims):
-    #         return MessageFormat().error_message("Token has expired.")
-    #     if not is_audience_valid(claims):
-    #         return MessageFormat().error_message("Token was not issued for the app.")
-    #     logger.info("Authorization successful.")
-    #     return MessageFormat().success_message(data={"claims": claims})
-
     def generate_new_token(self, refresh_token_details):
         """
         Generates new id_token and access_token from refresh token
@@ -229,8 +199,7 @@ class UserManager():
         except Exception as err:
             return MessageFormat().error_message(str(err))
 
-    @authorization
-    def get_user_details(self, token, email):
+    def get_user_details(self, email):
         """
         Fetches all cognito stored attributes
         for the user
@@ -240,7 +209,7 @@ class UserManager():
         :returns:
             dictionary, user details
         """
-        if email is None or token is None:
+        if email is None:
             return MessageFormat().error_message("Email and Token are required.")
         try:
             response = self._cognito_client.admin_get_user(
