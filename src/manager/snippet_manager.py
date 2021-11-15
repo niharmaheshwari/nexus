@@ -7,7 +7,7 @@ from src.model.snippet import Snippet
 from src.model.audit import Audit
 from src.model.message_format import MessageFormat
 from src.views.snippet_view import snippet_ops
-from src.constants.secrets import ACCESS_KEY, SECRET_KEY
+from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY
 from src.constants.constants import AWS_REGION, SNIPPET_TABLE
 
 # pylint: disable=broad-except
@@ -20,7 +20,7 @@ class SnippetManager():
         '''
         Restrict s3 client and table. These should be initialized once and not modified
         '''
-        self._db_client = boto3.resource('dynamodb', aws_access_key_id= ACCESS_KEY, aws_secret_access_key=SECRET_KEY,region_name=AWS_REGION)
+        self._db_client = boto3.resource('dynamodb', aws_access_key_id= ACCESS_KEY, aws_secret_access_key=SECRET_ACCESS_KEY, region_name=AWS_REGION)
         self._table = self._db_client.Table(SNIPPET_TABLE)
 
     @property
