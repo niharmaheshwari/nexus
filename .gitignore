@@ -153,3 +153,5 @@ cython_debug/
 
 # misc
 src/constants/secrets.py
+
+.idea
