@@ -4,6 +4,8 @@ from flask import (Blueprint, request)
 from flask.wrappers import Response
 from src.manager.search_manager import SearchManager
 from src.manager.snippet_manager import SnippetManager
+from src.manager.user_manager import UserManager
+from src.utilities.authorization import authorization
 from src.utils.utils import CustomJSONEncoder
 
 search = Blueprint('search', __name__, url_prefix='/search')
@@ -36,18 +38,21 @@ def search_tag():
     # TODO: error handling
 
 @search.route('/', methods=['POST'])
+@authorization
 def search_general():
     '''
-    The body will be a json object {"search_string": "looking for a python string"}
+    The body will be a json object {"search_string": "looking for a python string", "email":"talyakosch@gmail.com"}
     Matching will be applied to tags, description, and lang fields
 
     '''
     search_string = request.json['search_string']
+    email = request.json['email']
     search_manager = SearchManager()
     snippet_manager = SnippetManager()
+    user_manager = UserManager()
 
-    # TODO : update getting the user with real function call
-    user = 'user2'
+    token = request.headers.get("token", None)
+    user = user_manager.get_user_details(token, email)
 
     # Search es for the SnippetSnapshots corresponding to search string
     snippet_snapshots = search_manager.search_by_string(search_string, user)
