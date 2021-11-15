@@ -6,6 +6,7 @@ from flask import request, jsonify, Blueprint
 from src.manager.user_manager import UserManager
 from src.model.message_format import MessageFormat
 from src.utilities.authentication_utils import serialize_user_object
+from src.utilities.authorization import authorization
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.ERROR)
@@ -55,14 +56,14 @@ def refresh_token():
     return jsonify(MANAGER.generate_new_token(request_body))
 
 @auth.route('/get-user', methods=["POST"])
+@authorization
 def get_user_details():
     """
     Fetches user attributes
     """
     request_body = request.get_json()
-    token = request.headers.get("token", None)
     email = request_body.get("email", None)
-    response = MANAGER.get_user_details(token, email)
+    response = MANAGER.get_user_details(email)
     if response["data"] is not None:
         user_details = serialize_user_object(response["data"]["user"])
         return jsonify(MessageFormat().success_message(\
