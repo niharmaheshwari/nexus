@@ -4,6 +4,7 @@ User authorization decorator
 
 
 import logging
+from flask import request
 from jose import jwk, jwt
 from src.utilities.authentication_utils import get_keys, find_public_key, is_audience_valid, \
     is_token_expired, verify_public_key
@@ -21,7 +22,7 @@ def authorization(func):
         Authorizer wrapper over the function. Checks whether the user is
         authorized or not.
         """
-        id_token = args[1]
+        id_token = request.headers.get("token", None)
         if id_token is None:
             return MessageFormat().error_message("Token not present/Invalid token.")
         json_web_keys = get_keys()
