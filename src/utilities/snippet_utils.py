@@ -1,7 +1,7 @@
 '''
 Utility methods to work with Snippet Objects
 '''
-from model.snippet import Snippet
+from src.model.snippet import Snippet
 
 def merge_snippet(old_snip: Snippet, new_snip: Snippet):
     '''

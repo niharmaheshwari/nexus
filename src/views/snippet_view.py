@@ -1,10 +1,9 @@
 ''' Snippet View '''
 from copy import Error
 import logging
-from flask import ( Blueprint, Response)
-from werkzeug.wrappers import request
-from manager.snippet_manager import SnippetManager
-from model.message_format import MessageFormat
+from flask import (Blueprint, Response, request)
+from src.manager.snippet_manager import SnippetManager
+from src.model.message_format import MessageFormat
 
 snippet_blueprint = Blueprint('snippet', __name__, url_prefix='/snippet')
 mgr = SnippetManager()

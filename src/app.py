@@ -1,12 +1,12 @@
 '''Main Module'''
 import argparse
 from flask import Flask
-import utilities.logging as log
-from views.snippet_view import snippet_blueprint
-from views.test_view import test
-from views.authentication import auth
-from views.dummy_view import dummy
-import constants.constants as const
+import src.utilities.logging as log
+from src.views.snippet_view import snippet_blueprint
+from src.views.test_view import test
+from src.views.authentication import auth
+from src.views.dummy_view import dummy
+import src.constants.constants as const
 
 logger = log.get_logger()
 

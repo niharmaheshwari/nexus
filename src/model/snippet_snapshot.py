@@ -7,7 +7,7 @@ class SnippetSnapshot():
     '''
     Class definition to represent the minified view of the Snippet
     Attributes
-        id  : A hex string representing a unique id for a snippet
+        id          : A hex string representing a unique id for a snippet
         tags        : A list of Strings representing the Snippet tags
         desc        : A user description for a code snippet
         lang        : The language tag of the snippet

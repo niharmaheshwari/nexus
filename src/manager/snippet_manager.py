@@ -6,15 +6,15 @@ from boto3.dynamodb.conditions import Key
 import logging
 import flask
 import json
-import constants.constants as const
-from model.snippet import Snippet
-from model.snippet_snapshot import SnippetSnapshot
-from manager.user_manager import UserManager
+import src.constants.constants as const
+from src.model.snippet import Snippet
+from src.model.snippet_snapshot import SnippetSnapshot
+from src.manager.user_manager import UserManager
 import datetime
 import uuid
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
-from utilities.snippet_utils import merge_snippet
+from src.utilities.snippet_utils import merge_snippet
 
 LANG_EXTENTION = {
     'py': 'Python',
@@ -102,9 +102,9 @@ class SnippetManager():
             # Construct Snippet() from the parital
             snippet_raw = json.load(snippet_raw)
             # 1. Get User
-            # TODO : Try using the real auth module after getting the new master auth
-            #user_details = self.user.get_user_details(snippet_raw['email'])
-            snippet.author = 'nihar-maheshwari'#user_details.name
+            user_details = self.user.get_user_details(snippet_raw['email'])
+            logging.info('User is : %s', user_details )
+            snippet.author = user_details['data']['user'].name
 
             # 2. Infer Language
             snippet.lang = LANG_EXTENTION[file_data.filename.split('.')[-1]]
@@ -143,8 +143,8 @@ class SnippetManager():
                 desc=snippet.desc,
                 lang=snippet.lang
             )
-            # TODO : Put the real user here. I dont have permission
-            # self.es.index(index = 'nihar-maheshwari', doc_type = '_doc', id = snapshot.id, body = snapshot.to_dict())
+
+            self.es.index(index = snippet.author, doc_type = 'snippet', body = snapshot.to_dict())
 
         except Exception as e:
             logging.error('There was an exception during upload.')
@@ -179,9 +179,9 @@ class SnippetManager():
         try:
             # Construct Snippet() from the parital
             # 1. Get User
-            # TODO : Try using the real auth module after getting the new master auth
-            #user_details = self.user.get_user_details(snippet_raw['email'])
-            snippet.author = 'nihar-maheshwari'#user_details.name
+            user_details = self.user.get_user_details(snippet_raw['email'])
+            logging.info('User is : %s', user_details )
+            snippet.author = user_details['data']['user'].name
 
             # 2. Infer Language
             snippet.lang = LANG_EXTENTION[file_data.filename.split('.')[-1]] if file_data else None
@@ -218,8 +218,7 @@ class SnippetManager():
                 lang=snippet.lang
             )
             # TODO : Put the real user here. I dont have permission
-            # self.es.delete(index = 'user', id = snapshot.id)
-            # self.es.index(index = 'user', doc_type = '_doc', id = snapshot.id, body = snapshot.to_dict())
+            self.es.index(index = snippet.author, doc_type = 'snippet', id = snapshot.id, body = snapshot.to_dict())
 
         except Exception as e:
             logging.error('There was an exception during upload.')
