@@ -146,6 +146,7 @@ cython_debug/
 # vs code
 **/extensions.json
 **/settings.json
+**/.vscode
 
 # init files
 **/__init__.py
