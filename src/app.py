@@ -2,6 +2,7 @@
 import  logging
 import  argparse
 from    flask              import Flask
+from    src.views.search_view  import search
 from    src.views.snippet_view import snippet
 from    src.views.test_view    import test
 from    src.views.authentication import auth
@@ -36,6 +37,7 @@ def register():
     app = Flask(NAME)
     app.register_blueprint(snippet)
     app.register_blueprint(test)
+    app.register_blueprint(search)
     app.register_blueprint(auth)
     app.register_blueprint(dummy)
     return app

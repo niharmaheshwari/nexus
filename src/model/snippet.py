@@ -112,3 +112,12 @@ class Snippet():
     @lang.setter
     def lang(self, value):
         self._lang = value
+    
+    @property
+    def shares(self):
+        '''Getter for shares'''
+        return self._shares
+
+    @shares.setter
+    def shares(self, value):
+        self._shares = value
