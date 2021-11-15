@@ -4,7 +4,7 @@ User manager class
 
 import logging
 import boto3
-from src.constants.cognito_constants import ACCESS_KEY, SECRET_ACCESS_KEY, \
+from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY, \
             REGION, USER_POOL_ID, CLIENT_ID
 from src.utilities.authentication_utils import get_hashcode, deserialize_user_object
 from src.model.message_format import MessageFormat

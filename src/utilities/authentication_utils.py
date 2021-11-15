@@ -9,7 +9,7 @@ import json
 import time
 from urllib import request
 from jose.utils import base64url_decode
-from src.constants.cognito_constants import CLIENT_ID, CLIENT_SECRET, KEYS_URL
+from src.constants.secrets import CLIENT_ID, CLIENT_SECRET, KEYS_URL
 from src.model.user import User
 
 def get_hashcode(username):
