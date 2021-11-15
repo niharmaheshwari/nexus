@@ -1,28 +1,14 @@
 '''Main Module'''
-import  logging
-import  argparse
-from    flask              import Flask
-from    src.views.snippet_view import snippet
-from    src.views.test_view    import test
-from    src.views.authentication import auth
-from    src.views.dummy_view import dummy
+import argparse
+from flask import Flask
+import utilities.logging as log
+from views.snippet_view import snippet_blueprint
+from views.test_view import test
+from views.authentication import auth
+from views.dummy_view import dummy
+import constants.constants as const
 
-# Global APP Name
-NAME = 'NEXUS'
-
-# Set global root logging context
-ROOT = logging.getLogger()
-
-# Support the following logging levels
-LOG_LEVELS = {
-    'CRITICAL' : logging.CRITICAL,
-    'FATAL'    : logging.FATAL,
-    'ERROR'    : logging.ERROR,
-    'WARNING'  : logging.WARNING,
-    'INFO'     : logging.INFO,
-    'DEBUG'    : logging.DEBUG,
-    'NOTSET'   : logging.NOTSET
-}
+logger = log.get_logger()
 
 def register():
     '''
@@ -33,29 +19,12 @@ def register():
     Returns:
         the flask application context
     '''
-    app = Flask(NAME)
-    app.register_blueprint(snippet)
+    app = Flask(const.NAME)
+    app.register_blueprint(snippet_blueprint)
     app.register_blueprint(test)
     app.register_blueprint(auth)
     app.register_blueprint(dummy)
     return app
-
-def init_log(log_level = logging.INFO):
-    '''
-    Description
-        Set the logging context.
-    Note
-        If deploying on a container / lambda, ensure that there are no handlers associated to the
-        logging context (to prevent log messages from being supressed)
-    Parameters
-        default_level : Expects a log level. Default is INFO
-    Returns
-        -
-    '''
-    if ROOT.handlers:
-        for handler in ROOT.handlers:
-            ROOT.removeHandler(handler)
-    logging.basicConfig(format='%(asctime)s %(message)s',level=log_level)
 
 def parse_args():
     '''
@@ -86,14 +55,13 @@ def parse_args():
     )
     arguments = parser.parse_args()
     arguments.debug = arguments.debug == 'True'
-    arguments.log = LOG_LEVELS[arguments.log]
+    arguments.log = log.LOG_LEVELS[arguments.log]
     return arguments
 
 
 if __name__ == '__main__':
     args = parse_args()
-    init_log(args.log)
-    logging.info('Starting the flask server with the following arguments:')
-    logging.info('Flask Debugging: %s', format(args.debug))
-    logging.info('Log Level: %s', logging.getLevelName(args.log))
+    logger.info('Starting the flask server with the following arguments:')
+    logger.info('Flask Debugging: %s', format(args.debug))
+    logger.info('Log Level: %s', log.get_level_name(args.log))
     register().run(debug=args.debug, host=args.server, port=args.port)
