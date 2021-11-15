@@ -6,6 +6,7 @@ from src.views.snippet_view import snippet_blueprint
 from src.views.test_view import test
 from src.views.authentication import auth
 from src.views.dummy_view import dummy
+from src.views.search_view import search
 import src.constants.constants as const
 
 logger = log.get_logger()
@@ -22,6 +23,7 @@ def register():
     app = Flask(const.NAME)
     app.register_blueprint(snippet_blueprint)
     app.register_blueprint(test)
+    app.register_blueprint(search)
     app.register_blueprint(auth)
     app.register_blueprint(dummy)
     return app

@@ -4,6 +4,7 @@ import logging
 from flask import (Blueprint, Response, request)
 from src.manager.snippet_manager import SnippetManager
 from src.model.message_format import MessageFormat
+from src.utilities.authorization import authorization
 
 snippet_blueprint = Blueprint('snippet', __name__, url_prefix='/snippet')
 mgr = SnippetManager()
@@ -73,6 +74,7 @@ def remove_snippet(inflight_request):
         return Response(MessageFormat().error_message('Bad Request. Key does not exist', 400),400)
 
 @snippet_blueprint.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@authorization
 def snippet_ops():
     '''Snippet Operations'''
     handler_map = {

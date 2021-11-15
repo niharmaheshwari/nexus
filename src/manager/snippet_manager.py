@@ -15,6 +15,10 @@ import uuid
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 from src.utilities.snippet_utils import merge_snippet
+from src.model.snippet import Snippet
+from src.model.audit import Audit
+from src.model.message_format import MessageFormat
+from src.constants.constants import AWS_REGION, SNIPPET_TABLE
 
 LANG_EXTENTION = {
     'py': 'Python',
@@ -23,7 +27,7 @@ LANG_EXTENTION = {
     'sh': 'Shell'
 }
 
-
+# pylint: disable=broad-except
 class SnippetManager():
     '''
     Builder class for Snippets
@@ -250,4 +254,52 @@ class SnippetManager():
         res = self.table.delete_item(Key={'id': id})
         #self.es.delete(index = 'user', id = id)
         return
+
+    def get_snippets(self, snippet_ids):
+        '''
+        Get multiple snippets from DynamoDB
+        Arguments
+            snippet__ids: array of ids to fetch
+        Returns
+            Message with data =list of Snippets
+        
+        ''' 
+
+        # Search snippets table for multiple ids
+        try:
+            batch_keys = {
+            self._table.name: {
+            'Keys': [{'id': id} for id in snippet_ids]
+            }}
+            response = self._db_client.batch_get_item(RequestItems=batch_keys)
+        except Exception as err:
+            return MessageFormat().error_message(str(err))
+
+        # return a list of snippets
+        return MessageFormat().success_message(data=SnippetManager.dynamo_response_to_snippets(response))
+
+    @staticmethod
+    def dynamo_response_to_snippets(response):
+        '''
+        deserialize the dynamo response to a list of Snippets
+        '''
+        snippets_list = []
+        for item in response['Responses']['snippets']:
+
+            last_upd_user = item['audit']['last_upd_user']
+            creation_date = item['audit']['creation_date']
+            last_upd_date = item['audit']['last_upd_date']
+            creation_user = item['audit']['creation_user']
+            uri = item['uri']
+            snippet_id = item['id']
+            tags = item['tags']
+            shares = item['shares']
+            author = item['author']
+            lang = item['lang']
+            desc = item['desc']
+
+            audit = Audit(last_upd_date, last_upd_user, creation_date, creation_user)
+            snippets_list.append(Snippet(uri, desc, snippet_id, tags, author, shares, audit, lang))
+        
+        return snippets_list
 

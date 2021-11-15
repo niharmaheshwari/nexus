@@ -27,5 +27,22 @@ ___
 #### 3. Issues
 Check [this](https://github.com/niharmaheshwari/nexus/issues) for active development tickets and issues.
 
+#### 4. Tests
+**Steps for running unit tests and coverage**
+For running individual tests:
+```
+python3 -m unittest -v <test-module-path>
+```
+
+For running coverage:
+```
+coverage run -m unittest discover
+```
+
+For generating html report:
+```
+coverage html --omit="**/Library/*,*__init__.py" -d test/coverage
+```
+The above command generates a report in the `test` forlder.
 
 
