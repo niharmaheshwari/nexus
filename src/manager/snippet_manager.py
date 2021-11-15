@@ -2,13 +2,15 @@
 Snippet Manager
 '''
 import boto3
-from pprint import pprint
 
-from model.snippet import Snippet
-from model.audit import Audit
-from views.snippet_view import snippet_ops
-import manager.constants as constants
+from src.model.snippet import Snippet
+from src.model.audit import Audit
+from src.model.message_format import MessageFormat
+from src.views.snippet_view import snippet_ops
+from src.constants.secrets import ACCESS_KEY, SECRET_KEY
+from src.constants.constants import AWS_REGION, SNIPPET_TABLE
 
+# pylint: disable=broad-except
 class SnippetManager():
     '''
     Builder class for Snippets
@@ -18,8 +20,8 @@ class SnippetManager():
         '''
         Restrict s3 client and table. These should be initialized once and not modified
         '''
-        self._db_client = boto3.resource('dynamodb', aws_access_key_id= constants.ACCESS_KEY, aws_secret_access_key=constants.SECRET_KEY,region_name=constants.REGION)
-        self._table = self._db_client.Table('snippets')
+        self._db_client = boto3.resource('dynamodb', aws_access_key_id= ACCESS_KEY, aws_secret_access_key=SECRET_KEY,region_name=AWS_REGION)
+        self._table = self._db_client.Table(SNIPPET_TABLE)
 
     @property
     def table(self):
@@ -60,48 +62,45 @@ class SnippetManager():
         Arguments
             snippet__ids: array of ids to fetch
         Returns
-            list of Snippets
+            Message with data =list of Snippets
         
-        '''
-        # TODO : error handling 
+        ''' 
 
-        '''Search snippets table for multiple ids'''
-        batch_keys = {
-        self._table.name: {
-        'Keys': [{'id': id} for id in snippet_ids]
-        }}
+        # Search snippets table for multiple ids
+        try:
+            batch_keys = {
+            self._table.name: {
+            'Keys': [{'id': id} for id in snippet_ids]
+            }}
+            response = self._db_client.batch_get_item(RequestItems=batch_keys)
+        except Exception as err:
+            return MessageFormat().error_message(str(err))
 
-        response = self._db_client.batch_get_item(RequestItems=batch_keys)
+        # return a list of snippets
+        return MessageFormat().success_message(data=SnippetManager.dynamo_response_to_snippets(response))
 
-        '''return a list of Snippets'''
-        return self.dynamo_response_to_snippets(response)
-
-    def dynamo_response_to_snippets(self, response):
+    @staticmethod
+    def dynamo_response_to_snippets(response):
         '''
         deserialize the dynamo response to a list of Snippets
         '''
-        json_snippets_list = response['Responses']['snippets']
         snippets_list = []
-        for item in json_snippets_list: 
-            a = Audit()
-            s = Snippet()
-            audit = item['audit']
+        for item in response['Responses']['snippets']:
 
-            a.last_upd_user = audit['last_upd_user']
-            a.creation_date = audit['creation_date']
-            a.last_upd_date = audit['last_upd_date']
-            a.creation_user = audit['creation_user']
+            last_upd_user = item['audit']['last_upd_user']
+            creation_date = item['audit']['creation_date']
+            last_upd_date = item['audit']['last_upd_date']
+            creation_user = item['audit']['creation_user']
+            uri = item['uri']
+            snippet_id = item['id']
+            tags = item['tags']
+            shares = item['shares']
+            author = item['author']
+            lang = item['lang']
+            desc = item['desc']
 
-            s.audit = audit
-            s.uri = item['uri']
-            s.id = item['id']
-            s.tags = item['tags']
-            s.shares = item['shares']
-            s.author = item['author']
-            s.lang = item['lang']
-            s.desc = item['desc']
-
-            snippets_list.append(s)
+            audit = Audit(last_upd_date, last_upd_user, creation_date, creation_user)
+            snippets_list.append(Snippet(uri, desc, snippet_id, tags, author, shares, audit, lang))
         
         return snippets_list
 

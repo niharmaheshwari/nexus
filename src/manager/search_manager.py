@@ -1,63 +1,39 @@
+'''
+Search Manager
+'''
 import boto3
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
-from src.manager import constants
+from src.constants.secrets import ACCESS_KEY, SECRET_KEY
+from src.constants.constants import AWS_REGION, ELASTIC_SEARCH, ES_SERVICE
 from src.model.snippet_snapshot import SnippetSnapshot
 
 class SearchManager():
+    '''
+    Builder class for Search
+    '''
 
     def __init__(self):
-        creds = boto3.Session(constants.ACCESS_KEY, constants.SECRET_KEY, 
-        region_name=constants.REGION).get_credentials()
+        creds = boto3.Session(ACCESS_KEY, SECRET_KEY, 
+        region_name=AWS_REGION).get_credentials()
+        awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION, 
+        ES_SERVICE, session_token=creds.token)
 
-        awsauth = AWS4Auth(creds.access_key, creds.secret_key, constants.REGION, 
-        constants.SERVICE, session_token=creds.token)
-        
-        '''Connect to es'''
-        self._es = OpenSearch(['https://search-code-snippets-x7pez2uta5ofjf4sch7o63dd2y.us-east-2.es.amazonaws.com/'],
-                http_auth=awsauth, use_ssl = True, verify_certs=True, connection_class=RequestsHttpConnection)
-        
- 
-    def search_by_tags(self, tags, user) -> list[SnippetSnapshot]:
-        '''
-        Search es for exact tag matches.  All returned snippets will have 
-        at least one matching tag from tags
+        # connect to ES
+        self._es = OpenSearch([ELASTIC_SEARCH],http_auth=awsauth, use_ssl = True, 
+        verify_certs=True, connection_class=RequestsHttpConnection)
 
-        Inputs: tags = Array of strings . example ['python', 'binary search']
-                user = example 'user1' 
-        Returns: list of snippetSnapshots
-        '''
-        
-        # TODO: should also search lang? 
-        '''build search query for es'''
-        query = {"query" : {
-                "terms" : {
-                    "tags.keyword" : tags
-                }
-            }
-        }
-
-        '''search es using query in index user'''
-        response = self._es.search(
-            body = query,
-            index = user
-        )
-
-        '''deserialize es response to list of SnippetSnapshots'''
-        return self.es_result_to_snippet_snapshots(response) 
-
-        
-    
-    def search_by_string(self, search_string, user) -> list[SnippetSnapshot]: 
+    def search_by_string(self, search_string, user) -> list[SnippetSnapshot]:
         '''
         General search: search through tags and description using a search string
 
-        Inputs: search_string = "python code that searches a list quickly"
-                user = example 'user2' 
-        Returns: list of snippetSnapshots that match the search_string in either tags, desc, or lang fields
+        Inputs: search_string = "python code to do binary search"
+                user = example "user2"
+        Returns: list of snippetSnapshots that match the search_string in either tags,
+         desc, or lang fields
         '''
 
-        #TODO: do we want this to be fuzzy? 
+        # compose query for ES
         query = {"query" : {
                 "multi_match" : {
                     "query": search_string,
@@ -66,23 +42,42 @@ class SearchManager():
             }
         }
 
+        # search using query
         response = self._es.search(
             body = query,
             index = user
         )
        
-        return self.es_result_to_snippet_snapshots(response)
+       # deserialized response to list of snippetSnapshots
+        return SearchManager.es_result_to_snippet_snapshots(response)
+
+    def match_all(self):
+        '''
+        Returns all information in es database, for testing purposes
+        '''
+        query = {"query" : {
+                "match_all" : {}
+            }
+        }
+
+        response = self._es.search(
+            body = query,
+        )
+
+        return response
     
-    def es_result_to_snippet_snapshots(self, response) -> list[SnippetSnapshot]: 
-        '''deserialize es response to list of SnippetSnapshots'''
+    @staticmethod
+    def es_result_to_snippet_snapshots(response):
+        '''deserialize es response to list of snippetSnapshots'''
+        
         result = response['hits']['hits']
         snippet_list = []
         for item in result:
-            s = SnippetSnapshot()
-            s.id = item['_source']['id']
-            s.desc = item['_source']['desc']
-            s.tags = item['_source']['tags']
-            s.lang = item['_source']['lang']
-            snippet_list.append(s)   
+            snippet_id = item['_source']['id']
+            desc = item['_source']['desc']
+            tags = item['_source']['tags']
+            lang = item['_source']['lang']
+            snapshot= SnippetSnapshot(snippet_id, tags, desc, lang)
+            snippet_list.append(snapshot)
         return snippet_list
 
