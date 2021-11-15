@@ -1,19 +1,19 @@
 '''
 Snippet Manager
 '''
-import boto3
-from boto3.dynamodb.conditions import Key
 import logging
-import flask
 import json
+import boto3
+import datetime
+import uuid
+from boto3.dynamodb.conditions import Key
+import flask
+from opensearchpy import OpenSearch, RequestsHttpConnection
+from requests_aws4auth import AWS4Auth
 import src.constants.constants as const
 from src.model.snippet import Snippet
 from src.model.snippet_snapshot import SnippetSnapshot
 from src.manager.user_manager import UserManager
-import datetime
-import uuid
-from opensearchpy import OpenSearch, RequestsHttpConnection
-from requests_aws4auth import AWS4Auth
 from src.utilities.snippet_utils import merge_snippet
 from src.model.snippet import Snippet
 from src.model.audit import Audit
