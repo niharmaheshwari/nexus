@@ -3,7 +3,7 @@ import datetime
 from opensearchpy import OpenSearch, RequestsHttpConnection
 import boto3
 from requests_aws4auth import AWS4Auth
-from src.constants.secrets import ACCESS_KEY, SECRET_KEY
+from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY
 from src.constants.constants import ELASTIC_SEARCH, AWS_REGION, SNIPPET_TABLE
 from src.utils.utils import convert_to_dict
 from src.model.snippet_snapshot import SnippetSnapshot
@@ -19,7 +19,7 @@ def create_es_session():
     """
     service = "es"
     creds = boto3.Session(ACCESS_KEY,
-                          SECRET_KEY,
+                          SECRET_ACCESS_KEY,
                           region_name=AWS_REGION).get_credentials()
 
     awsauth = AWS4Auth(creds.access_key,
@@ -44,7 +44,7 @@ def create_dynamo_session():
     service = "dynamodb"
     session = boto3.Session(
         aws_access_key_id=ACCESS_KEY,
-        aws_secret_access_key=SECRET_KEY,
+        aws_secret_access_key=SECRET_ACCESS_KEY,
         region_name=AWS_REGION
     )
     dynamodb = session.resource(service, region_name=AWS_REGION)
