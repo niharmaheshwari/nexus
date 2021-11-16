@@ -88,9 +88,9 @@ class SnippetManager():
             snippet = Snippet.to_snippet(self.table.query(
                 KeyConditionExpression = Key('id').eq(id)
             )['Items'][0])
-            logging.info(f'Snippet Obtained : {snippet}')
+            logging.info('Snippet Obtained : %s', snippet)
         except Exception as key_error:
-            logging.error(f'Key: {id} does not exist in the database. Full Error : {key_error}')
+            logging.error('Key: %s does not exist in the database. Full Error : %s', id, key_error)
             snippet = None
         return snippet
 
@@ -136,7 +136,7 @@ class SnippetManager():
             # 8. Attempt to add Snippet to S3
             logging.info('Adding snippet to the S3 location')
             f = self._fs.upload_fileobj(file_data,const.BUCKET,file_data.filename, ExtraArgs = {
-                'Content-Type': 'text/plain'
+                'ContentType': 'text/plain'
             })
 
             # 9. Add metadata to Dynamo
@@ -211,7 +211,7 @@ class SnippetManager():
             logging.info('Adding snippet to the S3 location')
             if file_data:
                 f = self._fs.upload_fileobj(file_data,const.BUCKET,file_data.filename, ExtraArgs = {
-                'Content-Type': 'text/plain'
+                'ContentType': 'text/plain'
             })
 
             # 9. Add metadata to Dynamo
