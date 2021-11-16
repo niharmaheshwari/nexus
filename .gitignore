@@ -149,7 +149,7 @@ cython_debug/
 **/.vscode
 
 # init files
-**/__init__.py
+# **/__init__.py
 
 # misc
 src/constants/secrets.py
