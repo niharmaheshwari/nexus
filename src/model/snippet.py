@@ -30,6 +30,16 @@ class Snippet():
         self._audit = None
         self._lang = None
 
+    def __init__(self, uri, desc, id, tags, author, shares, audit, lang):
+        self._uri = uri
+        self._desc = desc
+        self._id = id
+        self._tags = tags
+        self._author = author
+        self._shares = shares
+        self._audit = audit
+        self._lang = lang
+
     @property
     def uri(self):
         '''Getter for uri'''
