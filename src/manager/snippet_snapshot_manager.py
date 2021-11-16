@@ -14,16 +14,16 @@ class SnippetSnapshotManager():
     '''
 
     def __init__(self):
-        creds = boto3.Session(ACCESS_KEY, SECRET_KEY, 
+        creds = boto3.Session(ACCESS_KEY, SECRET_KEY,
         region_name=AWS_REGION).get_credentials()
-        awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION, 
+        awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION,
         ES_SERVICE, session_token=creds.token)
 
         # connect to ES
-        self._es = OpenSearch([ELASTIC_SEARCH],http_auth=awsauth, use_ssl = True, 
+        self._es = OpenSearch([ELASTIC_SEARCH],http_auth=awsauth, use_ssl = True,
         verify_certs=True, connection_class=RequestsHttpConnection)
 
-    def search_by_string(self, search_string, user) -> list:
+    def search_by_string(self, search_string, email) -> list:
         '''
         General search: search through tags and description using a search string
 
@@ -45,9 +45,9 @@ class SnippetSnapshotManager():
         # search using query
         response = self._es.search(
             body = query,
-            index = user
+            index = email
         )
-       
+
        # deserialized response to list of snippetSnapshots
         return SnippetSnapshotManager.es_result_to_snippet_snapshots(response)
 
@@ -65,11 +65,11 @@ class SnippetSnapshotManager():
         )
 
         return response
-    
+
     @staticmethod
     def es_result_to_snippet_snapshots(response):
         '''deserialize es response to list of snippetSnapshots'''
-        
+
         result = response['hits']['hits']
         snippet_list = []
         for item in result:

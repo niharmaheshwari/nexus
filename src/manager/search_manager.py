@@ -25,14 +25,9 @@ class SearchManager():
         This method returns a MessageFormat with the search results, or 
         with an error message
         '''
-        # Get user information
-        user_response = self.user_manager.get_user_details(email)
-        if user_response["data"] is None:
-            return user_response
-        user = user_response["data"]["user"]
 
         # Get snippet snapshot information
-        snippet_snapshots = self.snippet_snapshot_manager.search_by_string(search_string, user)
+        snippet_snapshots = self.snippet_snapshot_manager.search_by_string(search_string, email)
         if snippet_snapshots == []:
             return MessageFormat().success_message(data={"snippets":[]})
         
@@ -44,7 +39,7 @@ class SearchManager():
             return snippets_response
         snippets = snippets_response["data"]
 
-        results = json.dumps({"snippets":snippets},cls=CustomJSONEncoder)
+        results = json.loads(json.dumps({"snippets":snippets},cls=CustomJSONEncoder))
         return MessageFormat().success_message(data=results)
 
     @staticmethod
