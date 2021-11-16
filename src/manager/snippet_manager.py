@@ -43,10 +43,10 @@ class SnippetManager():
         self._user = UserManager()
         self._creds = boto3.Session().get_credentials()
         self._awsauth = AWS4Auth(
-            self._creds.access_key, 
-            self._creds.secret_key, 
-            const.AWS_REGION, 
-            'es', 
+            self._creds.access_key,
+            self._creds.secret_key,
+            const.AWS_REGION,
+            'es',
             session_token=self._creds.token
         )
         self._es = OpenSearch(
@@ -154,12 +154,12 @@ class SnippetManager():
 
         except Exception as e:
             logging.error('There was an exception during upload.')
-            
+
             if 'email' not in snippet_raw:
                 logging.error('Email id field missing from the data sent in the request')
-            
+
             if (
-                file_data is None or 
+                file_data is None or
                 '.' not in file_data.filename or
                 file_data.filename.split('.')[-1] not in LANG_EXTENTION
             ):
@@ -230,12 +230,12 @@ class SnippetManager():
 
         except Exception as e:
             logging.error('There was an exception during upload.')
-            
+
             if 'email' not in snippet_raw:
                 logging.error('Email id field missing from the data sent in the request')
-            
+
             if (
-                file_data is None or 
+                file_data is None or
                 '.' not in file_data.filename or
                 file_data.filename.split('.')[-1] not in LANG_EXTENTION
             ):
@@ -266,8 +266,8 @@ class SnippetManager():
             snippet__ids: array of ids to fetch
         Returns
             Message with data =list of Snippets
-        
-        ''' 
+
+        '''
 
         # Search snippets table for multiple ids
         try:
@@ -303,7 +303,16 @@ class SnippetManager():
             desc = item['desc']
 
             audit = Audit(last_upd_date, last_upd_user, creation_date, creation_user)
-            snippets_list.append(Snippet(uri, desc, snippet_id, tags, author, shares, audit, lang))
-        
+            snippet = Snippet()
+            snippet.id = snippet_id
+            snippet.uri = uri
+            snippet.desc = desc
+            snippet.tags = tags
+            snippet.author = author
+            snippet.shares = shares
+            snippet.audit = audit
+            snippet.lang = lang
+            snippets_list.append(snippet)
+
         return snippets_list
 
