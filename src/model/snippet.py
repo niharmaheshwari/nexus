@@ -17,20 +17,17 @@ class Snippet():
         lang        : The language tag of the snippet
     '''
 
-    def __init__(self):
+    def __init__(self, uri=None,
+                 desc=None,
+                 id=None,
+                 tags=None,
+                 author=None,
+                 shares=None,
+                 audit=None,
+                 lang=None):
         '''
-        This should always initialize an empty snippet
+        This is used to create a snippet object
         '''
-        self._uri = None
-        self._desc = None
-        self._id = None
-        self._tags = None
-        self._author = None
-        self._shares = None
-        self._audit = None
-        self._lang = None
-
-    def __init__(self, uri, desc, id, tags, author, shares, audit, lang):
         self._uri = uri
         self._desc = desc
         self._id = id
