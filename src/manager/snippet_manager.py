@@ -135,7 +135,9 @@ class SnippetManager():
 
             # 8. Attempt to add Snippet to S3
             logging.info('Adding snippet to the S3 location')
-            f = self._fs.upload_fileobj(file_data,const.BUCKET,file_data.filename)
+            f = self._fs.upload_fileobj(file_data,const.BUCKET,file_data.filename, ExtraArgs = {
+                'Content-Type': 'text/plain'
+            })
 
             # 9. Add metadata to Dynamo
             self.table.put_item(Item= snippet.to_dict(), ReturnValues='ALL_OLD')
@@ -148,7 +150,7 @@ class SnippetManager():
                 lang=snippet.lang
             )
 
-            self.es.index(index = snippet.author, doc_type = 'snippet', body = snapshot.to_dict())
+            self.es.index(index = snippet_raw['email'], doc_type = 'snippet', body = snapshot.to_dict())
 
         except Exception as e:
             logging.error('There was an exception during upload.')
@@ -208,7 +210,9 @@ class SnippetManager():
             # 8. Attempt to add Snippet to S3
             logging.info('Adding snippet to the S3 location')
             if file_data:
-                f = self._fs.upload_fileobj(file_data,const.BUCKET,file_data.filename)
+                f = self._fs.upload_fileobj(file_data,const.BUCKET,file_data.filename, ExtraArgs = {
+                'Content-Type': 'text/plain'
+            })
 
             # 9. Add metadata to Dynamo
             snippet = merge_snippet(self.get_snippet(snippet.id), snippet)
@@ -222,7 +226,7 @@ class SnippetManager():
                 lang=snippet.lang
             )
             # TODO : Put the real user here. I dont have permission
-            self.es.index(index = snippet.author, doc_type = 'snippet', id = snapshot.id, body = snapshot.to_dict())
+            self.es.index(index = snippet_raw['email'], doc_type = 'snippet', id = snapshot.id, body = snapshot.to_dict())
 
         except Exception as e:
             logging.error('There was an exception during upload.')

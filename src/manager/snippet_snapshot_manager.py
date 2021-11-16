@@ -4,7 +4,7 @@ Snippet Snapshot Manager
 import boto3
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
-from src.constants.secrets import ACCESS_KEY, SECRET_KEY
+from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY
 from src.constants.constants import AWS_REGION, ELASTIC_SEARCH, ES_SERVICE
 from src.model.snippet_snapshot import SnippetSnapshot
 
@@ -14,9 +14,9 @@ class SnippetSnapshotManager():
     '''
 
     def __init__(self):
-        creds = boto3.Session(ACCESS_KEY, SECRET_KEY,
-        region_name=AWS_REGION).get_credentials()
-        awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION,
+        creds = boto3.Session(ACCESS_KEY, SECRET_ACCESS_KEY,
+                              region_name=AWS_REGION).get_credentials()
+        awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION, 
         ES_SERVICE, session_token=creds.token)
 
         # connect to ES
