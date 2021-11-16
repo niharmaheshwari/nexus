@@ -45,4 +45,21 @@ coverage html --omit="**/Library/*,*__init__.py" -d test/coverage
 ```
 The above command generates a report in the `test` forlder.
 
-
+#### 5. Build and Run the service
+**Steps for building and running the nexus service**
+1. ssh to the ec2 server "3.135.193.250"
+2. Login to the user nexus using the password 'nexus' without quotes
+```
+sudo su nexus
+```
+3. Switch to home directory
+```
+cd ~
+```
+4. Run the following commands, when prompted for ssh password enter "nexus123" without quotes
+```
+source env/bin/activate
+tmux kill-server
+tmux
+./deploy.sh
+```
