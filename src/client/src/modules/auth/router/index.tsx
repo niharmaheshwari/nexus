@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Login from '../presentationLayer/login';
 import SignUp from '../presentationLayer/signUp';
 import NotFound from "../../home/presentationLayer/notFound";
