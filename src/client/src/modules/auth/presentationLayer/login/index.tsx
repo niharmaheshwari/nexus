@@ -1,7 +1,9 @@
 import React from 'react'
 class Login extends React.Component {
   render(){
-    return <div> Login Page </div> 
+    return <>
+        <div> Login in Page</div>
+    </>;
   }
 }
 
