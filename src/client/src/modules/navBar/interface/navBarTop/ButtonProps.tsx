@@ -1,6 +1,6 @@
 import React from "react";
 export interface ButtonProps {
-    onClick: () => void;
-    align: string
+    destination: string
     children?: React.ReactNode
+    style?: any
 }

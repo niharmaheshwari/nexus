@@ -1,4 +1,5 @@
 import { Grid } from "@mui/material";
+import { NavBarButton } from "./components";
 
 const TopNavBar = () => {
     return (
@@ -6,16 +7,12 @@ const TopNavBar = () => {
             <Grid item xs={4}>
                 <div>NEXUS</div>
             </Grid>
-            <Grid container item xs={8}>
-                <Grid item xs={4}>
-                    <div>Login</div>
-                </Grid>
-                <Grid item xs={4}>
-                    <div>Sign Up</div>
-                </Grid>
-                <Grid item xs={4}>
-                    <div>Dashboard</div>
-                </Grid>
+            <Grid item xs={8}>
+                <div style={{display: "flex", justifyContent: "flex-end"}}>
+                    <NavBarButton destination={"/auth/login"} style={{padding: "5px"}}>Login</NavBarButton>
+                    <NavBarButton destination={"/auth/sign-up"} style={{padding: "5px"}}>Sign Up</NavBarButton>
+                    <NavBarButton destination={"/auth/dashboard"} style={{padding: "5px"}}>Dashboard</NavBarButton>
+                </div>
             </Grid>
         </Grid>
     );
