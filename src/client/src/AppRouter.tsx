@@ -1,16 +1,15 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './modules/auth/presentationLayer/login'
-import SignUp from './modules/auth/presentationLayer/signUp';
 import AuthRouter from './modules/auth/router';
+import Home from './modules/home/presentationLayer/landing';
+import NotFound from './modules/home/presentationLayer/notFound';
 
 
 const AppRouter = () => (
   <Router>
     <Routes>
       <Route path="auth/*" element={<AuthRouter/>}/>
+      <Route path="/" element={<Home/>}/>
+      <Route path="*" element={<NotFound/>}/>
     </Routes>
   </Router>
 );
