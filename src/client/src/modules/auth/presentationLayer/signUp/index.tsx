@@ -5,6 +5,7 @@ import {Button, Grid, TextField} from "@mui/material";
 import MomentUtils from "@date-io/moment";
 import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
+import signUpService from "../../serviceLayer/signUpService";
 
 interface Props {
   [name: string]: any
@@ -37,6 +38,11 @@ class SignUp extends React.Component<Props, State> {
     event.preventDefault();
     console.log("Submit called")
     console.log(JSON.stringify(this.state))
+    signUpService.signUp(this.state.name,
+        this.state.email,
+        this.state.phone,
+        this.state.birthdate as Date,
+        this.state.password);
   }
 
   handleChange(event: React.SyntheticEvent) {
@@ -45,10 +51,8 @@ class SignUp extends React.Component<Props, State> {
       ...this.state,
       [name]: value,
     });
-    console.log(JSON.stringify(this.state))
   }
   handleDateChange(date: MaterialUiPickersDate) {
-    console.log("Date changed")
     console.log(JSON.stringify(date))
     this.setState({
       ...this.state,

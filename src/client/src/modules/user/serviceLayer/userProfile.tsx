@@ -18,3 +18,5 @@ class UserProfile {
         this.email = email
     }
 }
+
+export default UserProfile.shared();
