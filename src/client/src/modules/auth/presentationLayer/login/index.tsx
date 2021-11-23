@@ -3,7 +3,9 @@ import {cardContainer} from "./style";
 import NexusCard from "../../../core/components/nexusCard";
 import {Button, Grid, TextField} from "@mui/material";
 import userProfile from "../../../user/serviceLayer/userProfile";
+import loginService from "../../serviceLayer/loginService";
 import { useParams, useNavigate } from "react-router-dom";
+import {AuthToken} from "../../../user/serviceLayer/userProfile";
 
 interface Props {
     [name: string]: any
@@ -42,6 +44,23 @@ class Login extends React.Component<Props, State> {
         event.preventDefault();
         console.log("Submit called")
         console.log(JSON.stringify(this.state))
+        loginService.login(this.state.email, this.state.password)
+            .then((response) => {
+                const token: AuthToken = Object.assign(new AuthToken(), response.data?.data)
+                userProfile.updateAuthStatus(true, token);
+                userProfile.updateUserDetails(undefined, this.state.email);
+                this.props.navigate("/dashboard");
+            })
+            .catch((error) => {
+                this.setState({
+                    ...this.state,
+                    validated: false,
+                    validationMessage: error.data?.message ?? "Unexpected error occurred"
+                });
+                console.log("API Error message:" + this.state.validationMessage);
+                console.log("API Error:" + JSON.stringify(error));
+            });
+
     }
 
     handleChange(event: React.SyntheticEvent) {

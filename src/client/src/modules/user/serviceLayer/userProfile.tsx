@@ -3,7 +3,7 @@ class UserProfile {
     private name?: string
     private _email?: string
     private isAuthenticated: boolean
-    private token?: AuthTokens
+    private token?: AuthToken
 
     get email(): string | undefined {
         return this._email;
@@ -20,7 +20,7 @@ class UserProfile {
         return UserProfile.instance;
     }
 
-    public updateAuthStatus(authenticated: boolean, token?: AuthTokens) {
+    public updateAuthStatus(authenticated: boolean, token?: AuthToken) {
         this.isAuthenticated = authenticated;
         this.token = token;
     }
@@ -31,23 +31,31 @@ class UserProfile {
     }
 }
 
-export class AuthTokens {
-    private accessToken?: string
-    private tokenExpiry?: number
-    private idToken?: string
-    private refreshToken?: string
-    private tokenType?: string
+export class AuthToken {
+    private access_token?: string
+    private expires_in?: number
+    private id_token?: string
+    private refresh_token?: string
+    private token_type?: string
 
-    constructor(accessToken: string,
-                expiry: number,
-                idToken: string,
-                refreshToken: string,
-                tokenType: string) {
-        this.accessToken = accessToken;
-        this.tokenExpiry = expiry
-        this.idToken = idToken
-        this.refreshToken = refreshToken
-        this.tokenType = tokenType
+    get accessToken(): string | undefined {
+        return this.access_token;
+    }
+
+    get tokenExpiry(): number | undefined {
+        return this.expires_in;
+    }
+
+    get idToken(): string | undefined {
+        return this.id_token;
+    }
+
+    get refreshToken(): string | undefined {
+        return this.refresh_token;
+    }
+
+    get tokenType(): string | undefined {
+        return this.token_type;
     }
 }
 
