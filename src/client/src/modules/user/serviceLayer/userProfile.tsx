@@ -5,6 +5,14 @@ class UserProfile {
     private isAuthenticated: boolean
     private token?: AuthToken
 
+    get authenticated(): boolean {
+        return this.isAuthenticated
+    }
+
+    get idToken(): string | undefined {
+        return this.token?.idToken
+    }
+
     get email(): string | undefined {
         return this._email;
     }

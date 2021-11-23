@@ -1,13 +1,16 @@
 import {home} from "./style";
 import NexusCard from "../../../core/components/nexusCard";
-import React from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {Button, Grid, TextField} from "@mui/material";
+import {Navigate, useNavigate} from "react-router-dom";
+import {Button, Grid} from "@mui/material";
+import userProfile from "../../../user/serviceLayer/userProfile";
 
 
 const DashboardView = (props: any) => {
     let navigate = useNavigate();
-
+    if (!userProfile.authenticated) {
+        // navigate("/auth/unauthenticated")
+        return <Navigate to="/auth/unauthenticated" />;
+    }
     return (
         <div style={home}>
             <NexusCard>
