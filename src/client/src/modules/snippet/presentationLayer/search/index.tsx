@@ -56,7 +56,7 @@ class SnippetSearch extends React.Component<Props, State> {
                             </Button>
                         </Grid>
                     </Grid>
-                    <SnippetCard description={"First snippet"} tags={["tag1", "tag2"]}/>
+                    <SnippetCard description={"First snippet"} tags={["tag1", "tag2"]} onClick={() => {console.log("Card clicked")}}/>
                 </NexusCard>
             </div>
         );

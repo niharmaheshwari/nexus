@@ -1,14 +1,15 @@
 import NexusCard from "../../../../../core/components/nexusCard";
-import {card} from "./style";
+import "./style.css"
 
 interface Props {
     description: string,
     tags: string[]
+    onClick?: () => void
 }
 
 const SnippetCard = (props: Props) => {
     return (
-        <div style={card}>
+        <div className="cardMain" onClick={props.onClick}>
             <NexusCard>
                 <p>{props.description}</p>
                 <ul>
