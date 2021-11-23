@@ -8,13 +8,14 @@ class SignUpService {
                  email: string,
                  phone: string,
                  birthdate: Date,
-                 password: string) {
+                 password: string): Promise<any> {
         const requestParams = new SignUpRequestParams(name, email, phone, password, birthdate.toDateString());
         const response = await NetworkLayer.apiRequest("post",
             "signup",
             undefined,
             requestParams.params());
-        console.log("GOT API Response:", JSON.stringify(response))
+        console.log("GOT API Response:", JSON.stringify(response));
+        return response;
     }
 }
 
