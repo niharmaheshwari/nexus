@@ -13,7 +13,7 @@ const TopNavBar = () => {
                 <div style={{display: "flex", justifyContent: "flex-end"}}>
                     <NavBarButton destination={"/auth/login"} style={{padding: "5px"}}>Login</NavBarButton>
                     <NavBarButton destination={"/auth/sign-up"} style={{padding: "5px"}}>Sign Up</NavBarButton>
-                    <NavBarButton destination={"/auth/dashboard"} style={{padding: "5px"}}>Dashboard</NavBarButton>
+                    <NavBarButton destination={"/dashboard"} style={{padding: "5px"}}>Dashboard</NavBarButton>
                 </div>
             </Grid>
         </Grid>
