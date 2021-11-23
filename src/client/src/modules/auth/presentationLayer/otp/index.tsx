@@ -2,31 +2,65 @@ import React from "react";
 import {cardContainer} from "../signUp/style";
 import NexusCard from "../../../core/components/nexusCard";
 import {Button, Grid, TextField} from "@mui/material";
+import userProfile from "../../../user/serviceLayer/userProfile";
+import otpService from "../../serviceLayer/otpService";
+import {useNavigate, useParams} from "react-router-dom";
 
 interface Props {
     [name: string]: any
 }
 
 interface State {
-    otp: string
+    otp: string,
+    validated: boolean
+    [name: string]: any
 }
 
-class OTPView extends React.Component<Props, State> {
+class OTP extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
         this.state = {
-            otp: ""
+            otp: "",
+            validated: true
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.updateState = this.updateState.bind(this);
+    }
+
+    updateState(obj: any) {
+        this.setState({
+            ...this.state,
+            ...obj
+        })
     }
 
     handleSubmit(event: React.SyntheticEvent) {
         event.preventDefault();
         console.log("Submit called")
         console.log(JSON.stringify(this.state))
+        if (userProfile.email === undefined) {
+            this.updateState({
+                validated: false,
+                validationMessage: "Email cannot be empty"
+            })
+            return
+        }
+        otpService.confirmOtp(userProfile.email, this.state.otp)
+            .then((response) => {
+                this.props.navigate("/auth/dashboard")
+            })
+            .catch((error) => {
+                console.log("API Error message:" + this.state.validationMessage);
+                console.log("API Error:" + JSON.stringify(error));
+                this.updateState({
+                    validated: false,
+                    validationMessage: error.data?.message
+                })
+            });
+
     }
 
     handleChange(event: React.SyntheticEvent) {
@@ -59,12 +93,25 @@ class OTPView extends React.Component<Props, State> {
                                     Submit OTP
                                 </Button>
                             </Grid>
+                            {!this.state.validated
+                                ? <Grid item>
+                                    <p style={{color: "red"}}>{this.state.validationMessage}</p>
+                                </Grid>
+                                : <></>
+                            }
                         </Grid>
                     </form>
                 </NexusCard>
             </div>
         );
     }
+}
+
+const OTPView = (props: any) => {
+    let navigate = useNavigate();
+    let params = useParams();
+
+    return <OTP navigate={navigate} params={params} {...props} />
 }
 
 export default OTPView;

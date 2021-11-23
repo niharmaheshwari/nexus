@@ -51,7 +51,7 @@ class SignUp extends React.Component<any, State> {
         this.state.birthdate as Date,
         this.state.password)
         .then((response) => {
-          userProfile.updateUserDetails();
+          userProfile.updateUserDetails(this.state.name, this.state.email);
           this.props.navigate("/auth/otp")
         })
         .catch((error)=> {

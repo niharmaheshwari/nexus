@@ -1,9 +1,13 @@
 class UserProfile {
     private static instance: UserProfile
     private name?: string
-    private email?: string
+    private _email?: string
     private isAuthenticated: boolean
     private token?: AuthTokens
+
+    get email(): string | undefined {
+        return this._email;
+    }
 
     private constructor() {
         this.isAuthenticated = false;
@@ -23,7 +27,7 @@ class UserProfile {
 
     public updateUserDetails(name?: string, email?: string) {
         this.name = name;
-        this.email = email;
+        this._email = email;
     }
 }
 

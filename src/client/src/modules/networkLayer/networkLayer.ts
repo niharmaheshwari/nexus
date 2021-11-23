@@ -1,4 +1,4 @@
-import axios, {AxiosResponse, Method} from "axios";
+import axios, {Method} from "axios";
 
 class NetworkLayer {
     private static instance: NetworkLayer
