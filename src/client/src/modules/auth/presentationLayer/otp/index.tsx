@@ -50,7 +50,7 @@ class OTP extends React.Component<Props, State> {
         }
         otpService.confirmOtp(userProfile.email, this.state.otp)
             .then((response) => {
-                this.props.navigate("/auth/dashboard")
+                this.props.navigate("/auth/login")
             })
             .catch((error) => {
                 console.log("API Error message:" + this.state.validationMessage);
