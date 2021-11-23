@@ -1,6 +1,7 @@
 '''Main Module'''
 import argparse
 from flask import Flask
+from flask_cors import CORS
 import src.utilities.logging as log
 from src.views.snippet_view import snippet_blueprint
 from src.views.test_view import test
@@ -21,6 +22,7 @@ def register():
         the flask application context
     '''
     app = Flask(const.NAME)
+    CORS(app)
     app.register_blueprint(snippet_blueprint)
     app.register_blueprint(test)
     app.register_blueprint(search)

@@ -6,7 +6,7 @@ from src.manager.snippet_manager import SnippetManager
 from src.model.message_format import MessageFormat
 from src.utilities.authorization import authorization
 
-snippet_blueprint = Blueprint('snippet', __name__, url_prefix='/snippet')
+snippet_blueprint = Blueprint('snippet', __name__, url_prefix='/api/snippet')
 mgr = SnippetManager()
 
 
