@@ -18,7 +18,9 @@ interface State {
   email: string,
   phone: string,
   password: string,
-  birthdate: Date | null | undefined
+  birthdate: Date | null | undefined,
+  validated: boolean,
+  validationMessage: string
 }
 class SignUp extends React.Component<any, State> {
   constructor(props: Props) {
@@ -29,7 +31,9 @@ class SignUp extends React.Component<any, State> {
       email: "",
       phone: "",
       password: "",
-      birthdate: null
+      birthdate: null,
+      validated: true,
+      validationMessage: ""
     }
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -51,7 +55,13 @@ class SignUp extends React.Component<any, State> {
           this.props.navigate("/auth/otp")
         })
         .catch((error)=> {
-          console.log("API Error:" + JSON.stringify(error))
+          this.setState({
+            ...this.state,
+            validated: false,
+            validationMessage: error.data?.message
+          });
+          console.log("API Error message:" + this.state.validationMessage);
+          console.log("API Error:" + JSON.stringify(error));
         });
   }
 
@@ -137,6 +147,12 @@ class SignUp extends React.Component<any, State> {
                     Sign Up
                   </Button>
                 </Grid>
+                {!this.state.validated
+                    ? <Grid item>
+                      <p style={{color: "red"}}>{this.state.validationMessage}</p>
+                    </Grid>
+                    : <></>
+                }
               </Grid>
             </form>
           </NexusCard>
