@@ -6,6 +6,7 @@ import MomentUtils from "@date-io/moment";
 import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 import {MaterialUiPickersDate} from "@material-ui/pickers/typings/date";
 import signUpService from "../../serviceLayer/signUpService";
+import { Navigate } from 'react-router-dom'
 
 interface Props {
   [name: string]: any
@@ -16,9 +17,10 @@ interface State {
   email: string,
   phone: string,
   password: string,
-  birthdate: Date | null | undefined
+  birthdate: Date | null | undefined,
+  signUpValidated: boolean
 }
-class SignUp extends React.Component<Props, State> {
+class SignUp extends React.Component<any, State> {
   constructor(props: Props) {
     super(props);
 
@@ -27,7 +29,8 @@ class SignUp extends React.Component<Props, State> {
       email: "",
       phone: "",
       password: "",
-      birthdate: null
+      birthdate: null,
+      signUpValidated: false
     }
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -38,11 +41,17 @@ class SignUp extends React.Component<Props, State> {
     event.preventDefault();
     console.log("Submit called")
     console.log(JSON.stringify(this.state))
-    signUpService.signUp(this.state.name,
-        this.state.email,
-        this.state.phone,
-        this.state.birthdate as Date,
-        this.state.password);
+    console.log(JSON.stringify(this.props))
+    this.setState({
+      ...this.state,
+      signUpValidated: true
+    })
+    // return <Navigate to='/auth/login'/>
+    // signUpService.signUp(this.state.name,
+    //     this.state.email,
+    //     this.state.phone,
+    //     this.state.birthdate as Date,
+    //     this.state.password);
   }
 
   handleChange(event: React.SyntheticEvent) {
@@ -60,6 +69,9 @@ class SignUp extends React.Component<Props, State> {
     });
   }
   render(){
+    if (this.state.signUpValidated) {
+      return <Navigate to='/auth/otp'/>
+    }
     return (
         <div style={cardContainer}>
           <NexusCard>
@@ -124,7 +136,7 @@ class SignUp extends React.Component<Props, State> {
                 </Grid>
                 <Grid item>
                   <Button variant="contained" color="primary" type="submit">
-                    Submit
+                    Sign Up
                   </Button>
                 </Grid>
               </Grid>
