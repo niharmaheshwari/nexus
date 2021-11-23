@@ -2,6 +2,7 @@ import React from 'react'
 import {card} from "./style";
 import NexusCard from "../../../core/components/nexusCard";
 import {Button, Grid, TextField} from "@mui/material";
+import SnippetCard from "./components/snippetCard";
 
 interface Props {
     [name: string]: any
@@ -55,6 +56,7 @@ class SnippetSearch extends React.Component<Props, State> {
                             </Button>
                         </Grid>
                     </Grid>
+                    <SnippetCard description={"First snippet"} tags={["tag1", "tag2"]}/>
                 </NexusCard>
             </div>
         );
