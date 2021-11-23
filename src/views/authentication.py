@@ -55,15 +55,14 @@ def refresh_token():
     request_body = request.get_json()
     return jsonify(MANAGER.generate_new_token(request_body))
 
-@auth.route('/get-user', methods=["POST"])
+@auth.route('/get-user', methods=["GET"])
 @authorization
 def get_user_details():
     """
     Fetches user attributes
     """
-    request_body = request.get_json()
-    email = request_body.get("email", None)
-    response = MANAGER.get_user_details(email)
+    id_token = request.headers.get("token", None)
+    response = MANAGER.get_user_details(id_token)
     if response["data"] is not None:
         user_details = serialize_user_object(response["data"]["user"])
         return jsonify(MessageFormat().success_message(\
