@@ -1,4 +1,5 @@
 import {SnippetSearchRequestParams} from "../interface/snippetSearch/SnippetSearchRequestParams";
+import {SnippetUploadRequestParams} from "../interface/snippetUpload/SnippetUploadRequestParams";
 import networkLayer from "../../networkLayer/networkLayer";
 import userProfile from "../../user/serviceLayer/userProfile";
 
@@ -43,6 +44,18 @@ class SnippetService {
             undefined,
             false)
         return response;
+    }
+
+    async uploadSnippet(description: string, tags: string, file: File) {
+        if (userProfile.email === undefined) {
+            console.log("User email is undefined")
+            return Promise.reject("User email not defined")
+        }
+        const tagsList = tags.split(",")
+        const requestParams = new SnippetUploadRequestParams(description, tagsList, userProfile.email)
+        return await networkLayer.uploadFile("post",
+            "snippet",
+            requestParams, file);
     }
 }
 

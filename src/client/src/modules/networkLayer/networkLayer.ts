@@ -42,6 +42,31 @@ class NetworkLayer {
         }
         return response;
     }
+
+    public async uploadFile(method: Method, relativeUrl: string, data: any = {}, file: any, headers?: Record<string, string>, baseUrl: string = "http://localhost.charlesproxy.com:5000/api"): Promise<any> {
+        const formData = new FormData();
+        formData.append("data", JSON.stringify(data));
+        formData.append("file", file);
+        headers = {...headers, 'Content-type': 'multipart/form-data'}
+
+        console.log("Sending data:", JSON.stringify(data))
+
+        if (userProfile.authenticated && userProfile.idToken !== undefined) {
+            headers = {...headers, "token": userProfile.idToken}
+        }
+
+        const response = await axios.request({
+            method: method,
+            baseURL: baseUrl,
+            url: relativeUrl,
+            headers: headers,
+            data: formData
+        })
+        if (response.data.status_code !== undefined && response.data.status_code !== 200) {
+            return Promise.reject(response);
+        }
+        return response;
+    }
 }
 
 export default NetworkLayer.shared()

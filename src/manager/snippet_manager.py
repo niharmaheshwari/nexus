@@ -104,7 +104,7 @@ class SnippetManager():
         snippet = Snippet()
         try:
             # Construct Snippet() from the parital
-            snippet_raw = json.load(snippet_raw)
+            snippet_raw = json.loads(snippet_raw)
             # 1. Get User
             user_details = self.user.get_user_details(snippet_raw['email'])
             logging.info('User is : %s', user_details )
