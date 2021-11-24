@@ -31,6 +31,19 @@ class SnippetService {
         console.log("Fetch snippet data:", JSON.stringify(response));
         return response;
     }
+
+    async deleteSnippet(id: string) {
+        const queryParameters = {
+            id
+        }
+        const response = await networkLayer.apiRequest("delete",
+            "snippet",
+            queryParameters,
+            undefined,
+            undefined,
+            false)
+        return response;
+    }
 }
 
 export default new SnippetService();

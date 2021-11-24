@@ -73,7 +73,7 @@ def remove_snippet(inflight_request):
     except Error:
         return Response(MessageFormat().error_message('Bad Request. Key does not exist', 400),400)
 
-@snippet_blueprint.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@snippet_blueprint.route('', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @authorization
 def snippet_ops():
     '''Snippet Operations'''

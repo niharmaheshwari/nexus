@@ -4,12 +4,13 @@ import {home} from "../../../dashboard/presentationLayer/dashboard/style";
 import NexusCard from "../../../core/components/nexusCard";
 import {Button, Grid} from "@mui/material";
 import snippetService from "../../serviceLayer/snippetService";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 const SnippetDetailView = (props: any) => {
     let location = useLocation();
     let navigate = useNavigate();
     const snippet: Snippet = location.state
     const [code, setCode] = useState(null);
+    const [snippetDeleteFailed, setSnippetDeleteFailed] = useState(false);
     console.log(JSON.stringify("On snippet detail page"));
     useEffect(() => {
         snippetService.fetchSnippet(snippet.uri)
@@ -23,6 +24,16 @@ const SnippetDetailView = (props: any) => {
     }, [])
     const handleUpdate = () => {
         navigate("/snippet/update", {state: snippet});
+    }
+    const handleDelete = () => {
+        snippetService.deleteSnippet(snippet.id)
+            .then((response) => {
+                navigate("/snippet")
+            })
+            .catch((error) => {
+                console.log("Unable to delete snippet:", JSON.stringify(error));
+                setSnippetDeleteFailed(true);
+            })
     }
     return (
         <div style={home}>
@@ -60,16 +71,20 @@ const SnippetDetailView = (props: any) => {
                         }
                         <Grid style={{paddingTop: "10px", paddingBottom: "10px"}} container alignItems="center" direction="row" justifyContent="flex-start" spacing={2}>
                             <Grid item>
-                                <Button variant="contained" color="secondary" type="submit" onClick={handleUpdate}>
+                                <Button variant="contained" color="secondary" onClick={handleUpdate}>
                                     UPDATE
                                 </Button>
                             </Grid>
                             <Grid item>
-                                <Button variant="contained" color="secondary" onClick={() => navigate("/snippet/upload")}>
+                                <Button variant="contained" color="secondary" onClick={handleDelete}>
                                     DELETE
                                 </Button>
                             </Grid>
                         </Grid>
+                        {snippetDeleteFailed
+                            ? <p style={{color: "red"}}>Failed to delete the snippet</p>
+                            : <></>
+                        }
                     </Grid>
                     <Grid item xs={8}>
                         <pre>{code}</pre>
