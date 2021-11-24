@@ -1,0 +1,24 @@
+name: Branch Build & Deployment
+on:
+  push:
+    branches:
+      - '40-cicd-nm3223'
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Fetching Repository - ${{ github.ref }}"
+      - uses: actions/checkout@v2
+      - name: Initialize Branch Build
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install Dependencies
+        run: |
+          python -m pip install -- upgrade pip
+          pip install pylint
+          pip install -r requirements.txt
+      - name: Lint Project
+        run: |
+          echo "Starting a branch lint on ${{ github.ref }} for ${{ github.repository }}"
+          python src/utilities/lint.py --path ./src --threshold 9
