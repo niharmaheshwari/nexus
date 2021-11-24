@@ -19,6 +19,18 @@ class SnippetService {
         console.log("GOT API Response:", JSON.stringify(response));
         return response;
     }
+
+    async fetchSnippet(url: string) {
+        const response = await networkLayer.apiRequest("get",
+            "",
+            undefined,
+            undefined,
+            undefined,
+            false,
+            url)
+        console.log("Fetch snippet data:", JSON.stringify(response));
+        return response;
+    }
 }
 
 export default new SnippetService();

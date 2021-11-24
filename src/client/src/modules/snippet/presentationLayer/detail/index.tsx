@@ -3,11 +3,24 @@ import {Snippet} from "../../interface/snippetSearch/SnippetSearchResponse";
 import {home} from "../../../dashboard/presentationLayer/dashboard/style";
 import NexusCard from "../../../core/components/nexusCard";
 import {Button, Grid} from "@mui/material";
+import snippetService from "../../serviceLayer/snippetService";
+import {useEffect, useState} from "react";
 const SnippetDetailView = (props: any) => {
     let location = useLocation();
     let navigate = useNavigate();
     const snippet: Snippet = location.state
+    const [code, setCode] = useState(null);
     console.log(JSON.stringify("On snippet detail page"));
+    useEffect(() => {
+        snippetService.fetchSnippet(snippet.uri)
+            .then((response) => {
+                console.log("Snippet fetched successfully:", JSON.stringify(response.data))
+                setCode(response.data)
+            })
+            .catch((error) => {
+                console.log("Snippet fetch failed")
+            })
+    }, [])
     return (
         <div style={home}>
             <NexusCard>
@@ -42,11 +55,21 @@ const SnippetDetailView = (props: any) => {
                             </>
                             : <p>This snippet is not shared with anybody</p>
                         }
+                        <Grid style={{paddingTop: "10px", paddingBottom: "10px"}} container alignItems="center" direction="row" justifyContent="flex-start" spacing={2}>
+                            <Grid item>
+                                <Button variant="contained" color="secondary" type="submit" onClick={() => navigate("/snippet")}>
+                                    UPDATE
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button variant="contained" color="secondary" onClick={() => navigate("/snippet/upload")}>
+                                    DELETE
+                                </Button>
+                            </Grid>
+                        </Grid>
                     </Grid>
                     <Grid item xs={8}>
-                        <Button variant="contained" color="primary" onClick={() => navigate("/snippet/upload")}>
-                            UPLOAD
-                        </Button>
+                        <pre>{code}</pre>
                     </Grid>
                 </Grid>
             </NexusCard>
