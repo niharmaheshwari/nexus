@@ -4,7 +4,7 @@ import PrivateRoute from "../../user/serviceLayer/privateRoute";
 import NotFound from "../../home/presentationLayer/notFound";
 import SnippetDetailView from "../presentationLayer/detail";
 
-const SnippetRouter = () => (
+const SnippetRouter = (props: any) => (
     <Routes>
         <Route path='/' element={<PrivateRoute/>}>
             <Route path='/' element={<SnippetSearchView/>}/>

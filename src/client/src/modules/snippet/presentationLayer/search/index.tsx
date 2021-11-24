@@ -70,7 +70,7 @@ class SnippetSearch extends React.Component<Props, State> {
         }
         const snippet = this.state.snippets.snippets[idx];
         console.log("Clicked on snippet:" + snippet.id);
-        this.props.navigate("/snippet/" + snippet.id);
+        this.props.navigate("/snippet/" + snippet.id, {state: snippet});
     }
 
     render(){
