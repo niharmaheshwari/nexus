@@ -20,8 +20,14 @@ class NetworkLayer {
                       bodyParameters?: Record<string, string>,
                       headers?: Record<string, string>,
                       defaultHeaders: boolean = true,
-                      baseUrl: string = "http://localhost.charlesproxy.com:5000/api",
+                      baseUrl: string | undefined = undefined,
                       ): Promise<any> {
+        if (process.env.REACT_APP_SERVER !== undefined && baseUrl === undefined) {
+            baseUrl = process.env.REACT_APP_SERVER
+        }
+        if (process.env.REACT_APP_SERVER === undefined && baseUrl === undefined) {
+            baseUrl = "http://localhost:5000/api"
+        }
         if (defaultHeaders) {
             headers = {...headers, "Content-type": "application/json"}
         }
@@ -43,7 +49,16 @@ class NetworkLayer {
         return response;
     }
 
-    public async uploadFile(method: Method, relativeUrl: string, data: any = {}, file: any, headers?: Record<string, string>, baseUrl: string = "http://localhost.charlesproxy.com:5000/api"): Promise<any> {
+    public async uploadFile(method: Method,
+                            relativeUrl: string, data: any = {},
+                            file: any, headers?: Record<string, string>,
+                            baseUrl: string | undefined = undefined): Promise<any> {
+        if (process.env.REACT_APP_SERVER !== undefined && baseUrl === undefined) {
+            baseUrl = process.env.REACT_APP_SERVER
+        }
+        if (process.env.REACT_APP_SERVER === undefined && baseUrl === undefined) {
+            baseUrl = "http://localhost:5000/api"
+        }
         const formData = new FormData();
         formData.append("data", JSON.stringify(data));
         formData.append("file", file);
