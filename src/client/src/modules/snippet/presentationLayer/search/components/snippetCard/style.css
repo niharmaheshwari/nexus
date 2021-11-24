@@ -1,0 +1,9 @@
+.cardMain {
+    padding-left: 2px;
+    padding-bottom: 20px;
+    padding-top: 5px;
+    max-width: 300px;
+}
+.cardMain:hover {
+    cursor: pointer;
+}

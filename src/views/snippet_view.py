@@ -30,8 +30,8 @@ def create_snippet(inflight_request):
         request : Attributes from the session request
     '''
     snippet = None
-    try:
-        body = inflight_request.files['data']
+    try:    
+        body = inflight_request.form['data']
         file = inflight_request.files['file']
         snippet = mgr.create_snippet(body, file)
     except KeyError as e:
@@ -73,7 +73,7 @@ def remove_snippet(inflight_request):
     except Error:
         return Response(MessageFormat().error_message('Bad Request. Key does not exist', 400),400)
 
-@snippet_blueprint.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@snippet_blueprint.route('', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @authorization
 def snippet_ops():
     '''Snippet Operations'''
