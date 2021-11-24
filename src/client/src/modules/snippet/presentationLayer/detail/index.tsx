@@ -87,7 +87,7 @@ const SnippetDetailView = (props: any) => {
                         }
                     </Grid>
                     <Grid item xs={8}>
-                        <pre>{code}</pre>
+                        <pre style={{whiteSpace: "pre-wrap"}}>{code}</pre>
                     </Grid>
                 </Grid>
             </NexusCard>
