@@ -21,6 +21,9 @@ const SnippetDetailView = (props: any) => {
                 console.log("Snippet fetch failed")
             })
     }, [])
+    const handleUpdate = () => {
+        navigate("/snippet/update", {state: snippet});
+    }
     return (
         <div style={home}>
             <NexusCard>
@@ -57,7 +60,7 @@ const SnippetDetailView = (props: any) => {
                         }
                         <Grid style={{paddingTop: "10px", paddingBottom: "10px"}} container alignItems="center" direction="row" justifyContent="flex-start" spacing={2}>
                             <Grid item>
-                                <Button variant="contained" color="secondary" type="submit" onClick={() => navigate("/snippet")}>
+                                <Button variant="contained" color="secondary" type="submit" onClick={handleUpdate}>
                                     UPDATE
                                 </Button>
                             </Grid>
