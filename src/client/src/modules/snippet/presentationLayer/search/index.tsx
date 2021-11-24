@@ -5,6 +5,7 @@ import {Button, Grid, TextField} from "@mui/material";
 import SnippetCard from "./components/snippetCard";
 import snippetService from "../../serviceLayer/snippetService";
 import {Snippets} from "../../interface/snippetSearch/SnippetSearchResponse";
+import {useNavigate, useParams} from "react-router-dom";
 
 interface Props {
     [name: string]: any
@@ -69,6 +70,7 @@ class SnippetSearch extends React.Component<Props, State> {
         }
         const snippet = this.state.snippets.snippets[idx];
         console.log("Clicked on snippet:" + snippet.id);
+        this.props.navigate("/snippet/" + snippet.id);
     }
 
     render(){
@@ -112,4 +114,10 @@ class SnippetSearch extends React.Component<Props, State> {
     }
 }
 
-export default SnippetSearch;
+const SnippetSearchView = (props: any) => {
+    let navigate = useNavigate();
+    let params = useParams();
+    return <SnippetSearch navigate={navigate} params={params} {...props} />
+}
+
+export default SnippetSearchView;
