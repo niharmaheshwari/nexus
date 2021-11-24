@@ -8,7 +8,7 @@ search = Blueprint('search', __name__, url_prefix='/api/search')
 
 search_manager = SearchManager()
 
-@search.route('/', methods=['POST'])
+@search.route('', methods=['POST'])
 @authorization
 def search_general():
     '''

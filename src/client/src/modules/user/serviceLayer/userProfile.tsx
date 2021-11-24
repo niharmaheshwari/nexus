@@ -6,7 +6,7 @@ class UserProfile {
     private token?: AuthToken
 
     get authenticated(): boolean {
-        return this.isAuthenticated
+        return this.isAuthenticated && this.idToken !== undefined
     }
 
     get idToken(): string | undefined {

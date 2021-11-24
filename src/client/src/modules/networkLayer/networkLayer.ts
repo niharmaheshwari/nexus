@@ -1,4 +1,5 @@
 import axios, {Method} from "axios";
+import userProfile from "../user/serviceLayer/userProfile";
 
 class NetworkLayer {
     private static instance: NetworkLayer
@@ -23,6 +24,9 @@ class NetworkLayer {
                       ): Promise<any> {
         if (defaultHeaders) {
             headers = {...headers, "Content-type": "application/json"}
+        }
+        if (userProfile.authenticated && userProfile.idToken !== undefined) {
+            headers = {...headers, "token": userProfile.idToken}
         }
         const response = await axios.request({
             method: method,

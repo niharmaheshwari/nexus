@@ -3,6 +3,8 @@ import {card} from "./style";
 import NexusCard from "../../../core/components/nexusCard";
 import {Button, Grid, TextField} from "@mui/material";
 import SnippetCard from "./components/snippetCard";
+import snippetService from "../../serviceLayer/snippetService";
+import {Snippets} from "../../interface/snippetSearch/SnippetSearchResponse";
 
 interface Props {
     [name: string]: any
@@ -10,6 +12,7 @@ interface Props {
 
 interface State {
     searchQuery: string
+    snippets?: Snippets
     [name: string]: any
 }
 
@@ -20,9 +23,35 @@ class SnippetSearch extends React.Component<Props, State> {
 
         this.state = {
             searchQuery: "",
+            snippets: undefined
         }
 
         this.handleChange = this.handleChange.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
+        this.updateState = this.updateState.bind(this);
+    }
+
+    updateState(obj: any) {
+        this.setState({
+            ...this.state,
+            ...obj
+        })
+    }
+
+    handleSearch(event: React.SyntheticEvent) {
+        event.preventDefault()
+        snippetService.search(this.state.searchQuery)
+            .then((response) => {
+                console.log("Snippets" + JSON.stringify(response.data?.data));
+                const snippets: Snippets = response.data?.data
+                this.updateState({
+                    snippets
+                })
+            })
+            .catch((error) => {
+                console.log("API Error:" + JSON.stringify(error));
+            })
+
     }
 
     handleChange(event: React.SyntheticEvent) {
@@ -31,6 +60,15 @@ class SnippetSearch extends React.Component<Props, State> {
             ...this.state,
             [name]: value,
         });
+    }
+
+    handleSnippetClick(idx: number) {
+        if (this.state.snippets === undefined) {
+            console.log("No snippets")
+            return
+        }
+        const snippet = this.state.snippets.snippets[idx];
+        console.log("Clicked on snippet:" + snippet.id);
     }
 
     render(){
@@ -42,7 +80,7 @@ class SnippetSearch extends React.Component<Props, State> {
                         <Grid item>
                             <TextField
                                 id="search-input"
-                                name="search"
+                                name="searchQuery"
                                 label="Search"
                                 type="text"
                                 size="small"
@@ -51,12 +89,23 @@ class SnippetSearch extends React.Component<Props, State> {
                             />
                         </Grid>
                         <Grid item>
-                            <Button variant="contained" color="primary">
+                            <Button variant="contained" color="primary" onClick={this.handleSearch}>
                                 Search
                             </Button>
                         </Grid>
                     </Grid>
-                    <SnippetCard description={"First snippet"} tags={["tag1", "tag2"]} onClick={() => {console.log("Card clicked")}}/>
+                    {
+                        this.state.snippets?.snippets.map((item, idx) => {
+                            return <SnippetCard key={idx}
+                                                description={item.desc}
+                                                tags={item.tags}
+                                                onClick={() => {this.handleSnippetClick(idx)}}/>
+                        })
+                    }
+                    {this.state.snippets !== undefined && this.state.snippets.snippets.length === 0?
+                        <p style={{color: "red"}}>No snippets found. Search again</p> :
+                        <></>
+                    }
                 </NexusCard>
             </div>
         );
