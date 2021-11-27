@@ -19,6 +19,7 @@ from src.model.snippet import Snippet
 from src.model.audit import Audit
 from src.model.message_format import MessageFormat
 from src.constants.constants import AWS_REGION, SNIPPET_TABLE
+from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY
 
 LANG_EXTENTION = {
     'py': 'Python',
@@ -37,11 +38,15 @@ class SnippetManager():
         '''
         Restrict s3 client and table. These should be initialized once and not modified
         '''
-        self._db_client = boto3.resource(const.DB, region_name=const.AWS_REGION)
+        self._session = boto3.Session(
+            aws_access_key_id=ACCESS_KEY,
+            aws_secret_access_key=SECRET_ACCESS_KEY,
+        )
+        self._db_client = self._session.resource(const.DB, region_name=const.AWS_REGION)
         self._table = self._db_client.Table(const.SNIPPET_TABLE)
-        self._fs = boto3.client(const.FILE_SYSTEM)
+        self._fs = self._session.client(const.FILE_SYSTEM)
         self._user = UserManager()
-        self._creds = boto3.Session().get_credentials()
+        self._creds = self._session.get_credentials()
         self._awsauth = AWS4Auth(
             self._creds.access_key,
             self._creds.secret_key,
