@@ -25,7 +25,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Attempting to run test cases "
+      - run: echo "Attempting to run test cases under test.*"
       - uses: actions/checkout@v2
       - name: Run Test Cases
         env:
