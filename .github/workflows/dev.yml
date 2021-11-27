@@ -21,7 +21,7 @@ jobs:
       - name: Lint Project
         run: |
           echo "Starting a branch lint on ${{ github.ref }} for ${{ github.repository }}"
-          python src/utilities/lint.py --path ./src --threshold 8.5
+          python src/utilities/lint.py --path ./src --threshold 8.0
   test:
     runs-on: ubuntu-latest
     steps:
