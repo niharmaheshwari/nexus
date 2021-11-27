@@ -22,3 +22,24 @@ jobs:
         run: |
           echo "Starting a branch lint on ${{ github.ref }} for ${{ github.repository }}"
           python src/utilities/lint.py --path ./src --threshold 8.5
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Attempting to run test cases "
+      - uses: actions/checkout@v2
+      - name: Run Test Cases
+        env:
+          USER_POOL_ID: ${{ secrets.USER_POOL_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+          SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          REGION: ${{ secrets.REGION }}
+          KEYS_URL: ${{ secrets.KEYS_URL }}
+        run: |
+          echo "Running all test cases under test.* modules"
+          python -m unittest discover
+          coverage run -m unittest discover
+          coverage html --omit="**/Library/*,*__init__.py" -d test/coverage
+          echo "Publishing Results to S3"
+          python src/utilities/coverage_delivery.py
