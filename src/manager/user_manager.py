@@ -4,6 +4,7 @@ User manager class
 
 import logging
 import boto3
+from jose import jwt
 from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY, \
             REGION, USER_POOL_ID, CLIENT_ID
 from src.utilities.authentication_utils import get_hashcode, deserialize_user_object
@@ -201,17 +202,19 @@ class UserManager():
         except Exception as err:
             return MessageFormat().error_message(str(err))
 
-    def get_user_details(self, email):
+    def get_user_details(self, token):
         """
         Fetches all cognito stored attributes
         for the user
         :params:
-            email: str, unique email address for the user
+            token: str, session id for the user
         :returns:
             dictionary, with user object
         """
-        if email is None:
-            return MessageFormat().error_message("Email is required.")
+        # the user is verified at this point
+        # get the payload
+        claims = jwt.get_unverified_claims(token)
+        email = claims['email']
         try:
             response = self.cognito_client.admin_get_user(
                 UserPoolId=USER_POOL_ID,
