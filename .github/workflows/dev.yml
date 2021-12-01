@@ -55,5 +55,14 @@ jobs:
         run: |
           echo "Starting a docker build on ${{ github.ref }} for ${{ github.repository }}"
           docker build -t nexus:${GITHUB_REF##*/} .
-          echo "Build successful"
+          echo "Build successful. Publishing to ECR"
+      - name: Push to ECR
+        id: ecr
+        uses: jwalton/gh-ecr-push@v1
+        with:
+          access-key-id: ${{ secrets.ACCESS_KEY }}
+          secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+          region: us-east-2
+          image: nexus:${GITHUB_REF##*/}
+
 
