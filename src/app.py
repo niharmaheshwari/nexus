@@ -1,7 +1,7 @@
 '''Main Module'''
 import argparse
 from flask import Flask
-import src.utilities.logging as log
+import logging
 from src.views.snippet_view import snippet_blueprint
 from src.views.test_view import test
 from src.views.authentication import auth
@@ -9,7 +9,17 @@ from src.views.dummy_view import dummy
 from src.views.search_view import search
 import src.constants.constants as const
 
-logger = log.get_logger()
+logger = logging.getLogger()
+
+levels = {
+    'CRITICAL': logging.CRITICAL,
+    'FATAL': logging.FATAL,
+    'ERROR': logging.ERROR,
+    'WARNING': logging.WARNING,
+    'INFO': logging.INFO,
+    'DEBUG': logging.DEBUG,
+    'NOTSET': logging.NOTSET
+}
 
 def register():
     '''
@@ -57,7 +67,7 @@ def parse_args():
     )
     arguments = parser.parse_args()
     arguments.debug = arguments.debug == 'True'
-    arguments.log = log.LOG_LEVELS[arguments.log]
+    arguments.log = levels[arguments.log]
     return arguments
 
 
@@ -65,5 +75,5 @@ if __name__ == '__main__':
     args = parse_args()
     logger.info('Starting the flask server with the following arguments:')
     logger.info('Flask Debugging: %s', format(args.debug))
-    logger.info('Log Level: %s', log.get_level_name(args.log))
+    logger.info('Log Level: %s', logging.getLevelName(args.log))
     register().run(debug=args.debug, host=args.server, port=args.port)

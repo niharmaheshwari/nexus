@@ -38,8 +38,6 @@ jobs:
           KEYS_URL: ${{ secrets.KEYS_URL }}
         run: |
           echo "Running all test cases under test.* modules"
-          echo "Checking if environment variables are persisted"
-          echo "$USER_POOL_ID"
           python -m pip install --upgrade pip
           pip install pylint
           pip install -r requirements.txt
@@ -48,3 +46,14 @@ jobs:
           coverage html --omit="**/Library/*,*__init__.py" -d test/coverage
           echo "Publishing Results to S3"
           python src/utilities/coverage_delivery.py
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: "Attempting to build a docker image"
+      - uses: actions/checkout@v2
+      - name: Assemble and Deploy
+        run: |
+          echo "Starting a docker build on ${{ github.ref }} for ${{ github.repository }}"
+          docker build -t nexus:${{ github.ref }}
+          echo "Build successful"
+
