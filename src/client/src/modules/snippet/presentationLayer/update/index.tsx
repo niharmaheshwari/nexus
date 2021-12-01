@@ -44,7 +44,7 @@ class SnippetUpdate extends React.Component<Props, State> {
         event.preventDefault();
         console.log("Submit called")
         console.log(JSON.stringify(this.state))
-        snippetService.updateSnippet(this.state.description, this.state.tags, this.state.shareList, this.state.file)
+        snippetService.updateSnippet(this.snippet.id, this.state.description, this.state.tags, this.state.shareList, this.state.file)
             .then((response) => {
                 const snippet: Snippet = response.data?.data
                 this.props.navigate("/snippet/" + snippet.id, {state: snippet});

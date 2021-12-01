@@ -59,14 +59,14 @@ class SnippetService {
             requestParams, file);
     }
 
-    async updateSnippet(description: string, tags: string, shares: string, file?: File) {
+    async updateSnippet(id: string, description: string, tags: string, shares: string, file?: File) {
         if (userProfile.email === undefined) {
             console.log("User email is undefined")
             return Promise.reject("User email not defined")
         }
         const tagsList = tags.split(",")
         const shareList = shares.split(",")
-        const requestParams = new SnippetUpdateRequestParams(description, tagsList, shareList, userProfile.email)
+        const requestParams = new SnippetUpdateRequestParams(id, description, tagsList, shareList, userProfile.email)
         return await networkLayer.uploadFile("put",
             "snippet",
             requestParams,
