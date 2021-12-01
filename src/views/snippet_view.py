@@ -49,7 +49,7 @@ def update_snippet(inflight_request):
     '''
     snippet = None
     try:
-        body = inflight_request.files['data']
+        body = inflight_request.form['data']
         file = inflight_request.files['file'] if 'file' in inflight_request.files else None
         snippet = mgr.update_snippet(body, file)
     except KeyError as e:

@@ -179,7 +179,7 @@ class SnippetManager():
             snippet_raw : Raw data for the new snippet
             file_data   : Optionally the new code file
         '''
-        snippet_raw = json.load(snippet_raw)
+        snippet_raw = json.loads(snippet_raw)
         snippet = Snippet()
         snippet.id = snippet_raw['id']
         try:
