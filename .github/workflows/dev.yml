@@ -54,6 +54,6 @@ jobs:
       - name: Assemble and Deploy
         run: |
           echo "Starting a docker build on ${{ github.ref }} for ${{ github.repository }}"
-          docker build -t nexus:${{ github.ref }}
+          docker build -t nexus:${GITHUB_REF##*/} .
           echo "Build successful"
 
