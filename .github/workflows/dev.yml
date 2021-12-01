@@ -49,7 +49,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: "Attempting to build a docker image"
+      - run: echo "Attempting to build a docker image"
       - uses: actions/checkout@v2
       - name: Assemble and Deploy
         run: |
