@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.ERROR)
 MANAGER = UserManager()
 
-auth = Blueprint('auth', __name__, url_prefix='/auth')
+auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 @auth.route('/', methods=['GET'])
 def init():
