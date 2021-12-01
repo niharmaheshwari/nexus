@@ -50,8 +50,10 @@ class NetworkLayer {
     }
 
     public async uploadFile(method: Method,
-                            relativeUrl: string, data: any = {},
-                            file: any, headers?: Record<string, string>,
+                            relativeUrl: string,
+                            data: any = {},
+                            file: any,
+                            headers?: Record<string, string>,
                             baseUrl: string | undefined = undefined): Promise<any> {
         if (process.env.REACT_APP_SERVER !== undefined && baseUrl === undefined) {
             baseUrl = process.env.REACT_APP_SERVER
