@@ -4,11 +4,11 @@ from src.manager.search_manager import SearchManager
 from src.utilities.authorization import authorization
 from src.model.message_format import MessageFormat
 
-search = Blueprint('search', __name__, url_prefix='/search')
+search = Blueprint('search', __name__, url_prefix='/api/search')
 
 search_manager = SearchManager()
 
-@search.route('/', methods=['POST'])
+@search.route('', methods=['POST'])
 @authorization
 def search_general():
     '''
