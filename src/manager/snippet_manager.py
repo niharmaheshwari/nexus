@@ -94,7 +94,7 @@ class SnippetManager():
             snippet = None
         return snippet
 
-    def create_snippet(self, snippet_raw, file_data):
+    def create_snippet(self, snippet_raw, file_data, id_token):
         '''
         Create a new snippet and return it along with an ID
         Arguments:
@@ -106,7 +106,7 @@ class SnippetManager():
             # Construct Snippet() from the parital
             snippet_raw = json.loads(snippet_raw)
             # 1. Get User
-            user_details = self.user.get_user_details(snippet_raw['email'])
+            user_details = self.user.get_user_details(id_token)
             logging.info('User is : %s', user_details )
             snippet.author = user_details['data']['user'].name
 
@@ -172,7 +172,7 @@ class SnippetManager():
 
         return snippet
 
-    def update_snippet(self, snippet_raw, file_data):
+    def update_snippet(self, snippet_raw, file_data, id_token):
         '''
         Create a new snippet and return it along with an ID
         Arguments:
@@ -185,7 +185,7 @@ class SnippetManager():
         try:
             # Construct Snippet() from the parital
             # 1. Get User
-            user_details = self.user.get_user_details(snippet_raw['email'])
+            user_details = self.user.get_user_details(id_token)
             logging.info('User is : %s', user_details )
             snippet.author = user_details['data']['user'].name
 

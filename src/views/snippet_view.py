@@ -33,7 +33,8 @@ def create_snippet(inflight_request):
     try:    
         body = inflight_request.form['data']
         file = inflight_request.files['file']
-        snippet = mgr.create_snippet(body, file)
+        id_token = request.headers.get("token", None)
+        snippet = mgr.create_snippet(body, file, id_token)
     except KeyError as e:
         logging.error('The metadata or file was missing. Full error : %s', e)
 
@@ -51,7 +52,8 @@ def update_snippet(inflight_request):
     try:
         body = inflight_request.form['data']
         file = inflight_request.files['file'] if 'file' in inflight_request.files else None
-        snippet = mgr.update_snippet(body, file)
+        id_token = request.headers.get("token", None)
+        snippet = mgr.update_snippet(body, file, id_token)
     except KeyError as e:
         logging.error('The metadata was missing for updating the snippet. Full error %s' , e)
 
