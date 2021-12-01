@@ -4,6 +4,7 @@ import React from "react";
 import {home} from "../../../dashboard/presentationLayer/dashboard/style";
 import NexusCard from "../../../core/components/nexusCard";
 import {Button, Grid, TextField} from "@mui/material";
+import snippetService from "../../serviceLayer/snippetService";
 
 interface Props {
     [name: string]: any
@@ -43,7 +44,18 @@ class SnippetUpdate extends React.Component<Props, State> {
         event.preventDefault();
         console.log("Submit called")
         console.log(JSON.stringify(this.state))
-        console.log("Got file:" + JSON.stringify(this.state.file))
+        snippetService.updateSnippet(this.state.description, this.state.tags, this.state.shareList, this.state.file)
+            .then((response) => {
+                const snippet: Snippet = response.data?.data
+                this.props.navigate("/snippet/" + snippet.id, {state: snippet});
+            })
+            .catch((error) => {
+                this.updateState({
+                    showError: true,
+                    errorMessage: "Unable to upload file"
+                })
+                console.log("Unable to upload file", JSON.stringify(error))
+            })
     }
     handleChange(event: React.SyntheticEvent){
         const { name, value } = event.target as HTMLButtonElement;
