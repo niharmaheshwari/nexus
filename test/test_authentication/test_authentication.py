@@ -3,7 +3,9 @@ Test cases for user authentication and authorization
 """
 from datetime import datetime
 import unittest
+from unittest.mock import Mock
 from botocore.stub import Stubber
+from jose import jwt
 from src.manager.user_manager import UserManager
 
 class TestAuthentication(unittest.TestCase):
@@ -203,21 +205,17 @@ class TestAuthentication(unittest.TestCase):
         self.assertTrue(response["success"])
 
     # fetch user details flow
-    def test_get_user_details_missing_attribute(self):
-        """
-        Tests missing attributes for get user details
-        """
-        response = self.user_manager.get_user_details(email=None)
-        self.assertEqual("Email is required.", response["message"])
-        self.assertTrue(response["error"])
 
     def test_get_user_details_invalid_user(self):
         """
         Tests invalid email for get user details
         """
         self.stubber.add_client_error("admin_get_user", "UserNotFoundException")
+        jwt.get_unverified_claims = \
+            Mock(name="get_unverified_claims")
+        jwt.get_unverified_claims.return_value = {"email": "sample-email@gmail.com"}
         self.stubber.activate()
-        response = self.user_manager.get_user_details(email="sample@gmail.com")
+        response = self.user_manager.get_user_details(token="sample-token")
         self.assertEqual("Invalid username", response["message"])
         self.assertTrue(response["error"])
 
@@ -249,8 +247,11 @@ class TestAuthentication(unittest.TestCase):
             ]
         }
         self.stubber.add_response("admin_get_user", service_response)
+        jwt.get_unverified_claims = \
+            Mock(name="get_unverified_claims")
+        jwt.get_unverified_claims.return_value = {"email": "sample-email@gmail.com"}
         self.stubber.activate()
-        response = self.user_manager.get_user_details(email="sample@gmail.com")
+        response = self.user_manager.get_user_details(token="sample-token")
         self.assertEqual("success", response["message"])
         self.assertFalse(response["error"])
         self.assertTrue(response["success"])

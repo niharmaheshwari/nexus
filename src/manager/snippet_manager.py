@@ -88,13 +88,13 @@ class SnippetManager():
             snippet = Snippet.to_snippet(self.table.query(
                 KeyConditionExpression = Key('id').eq(id)
             )['Items'][0])
-            logging.info(f'Snippet Obtained : {snippet}')
+            logging.info('Snippet Obtained : %s', snippet)
         except Exception as key_error:
-            logging.error(f'Key: {id} does not exist in the database. Full Error : {key_error}')
+            logging.error('Key: %s does not exist in the database. Full Error : %s', id, key_error)
             snippet = None
         return snippet
 
-    def create_snippet(self, snippet_raw, file_data):
+    def create_snippet(self, snippet_raw, file_data, id_token):
         '''
         Create a new snippet and return it along with an ID
         Arguments:
@@ -104,9 +104,9 @@ class SnippetManager():
         snippet = Snippet()
         try:
             # Construct Snippet() from the parital
-            snippet_raw = json.load(snippet_raw)
+            snippet_raw = json.loads(snippet_raw)
             # 1. Get User
-            user_details = self.user.get_user_details(snippet_raw['email'])
+            user_details = self.user.get_user_details(id_token)
             logging.info('User is : %s', user_details )
             snippet.author = user_details['data']['user'].name
 
@@ -136,7 +136,7 @@ class SnippetManager():
             # 8. Attempt to add Snippet to S3
             logging.info('Adding snippet to the S3 location')
             f = self._fs.upload_fileobj(file_data,const.BUCKET,file_data.filename, ExtraArgs = {
-                'Content-Type': 'text/plain'
+                'ContentType': 'text/plain'
             })
 
             # 9. Add metadata to Dynamo
@@ -172,20 +172,20 @@ class SnippetManager():
 
         return snippet
 
-    def update_snippet(self, snippet_raw, file_data):
+    def update_snippet(self, snippet_raw, file_data, id_token):
         '''
         Create a new snippet and return it along with an ID
         Arguments:
             snippet_raw : Raw data for the new snippet
             file_data   : Optionally the new code file
         '''
-        snippet_raw = json.load(snippet_raw)
+        snippet_raw = json.loads(snippet_raw)
         snippet = Snippet()
         snippet.id = snippet_raw['id']
         try:
             # Construct Snippet() from the parital
             # 1. Get User
-            user_details = self.user.get_user_details(snippet_raw['email'])
+            user_details = self.user.get_user_details(id_token)
             logging.info('User is : %s', user_details )
             snippet.author = user_details['data']['user'].name
 
@@ -211,7 +211,7 @@ class SnippetManager():
             logging.info('Adding snippet to the S3 location')
             if file_data:
                 f = self._fs.upload_fileobj(file_data,const.BUCKET,file_data.filename, ExtraArgs = {
-                'Content-Type': 'text/plain'
+                'ContentType': 'text/plain'
             })
 
             # 9. Add metadata to Dynamo

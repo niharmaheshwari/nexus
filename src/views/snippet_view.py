@@ -6,7 +6,7 @@ from src.manager.snippet_manager import SnippetManager
 from src.model.message_format import MessageFormat
 from src.utilities.authorization import authorization
 
-snippet_blueprint = Blueprint('snippet', __name__, url_prefix='/snippet')
+snippet_blueprint = Blueprint('snippet', __name__, url_prefix='/api/snippet')
 mgr = SnippetManager()
 
 
@@ -30,10 +30,11 @@ def create_snippet(inflight_request):
         request : Attributes from the session request
     '''
     snippet = None
-    try:
-        body = inflight_request.files['data']
+    try:    
+        body = inflight_request.form['data']
         file = inflight_request.files['file']
-        snippet = mgr.create_snippet(body, file)
+        id_token = request.headers.get("token", None)
+        snippet = mgr.create_snippet(body, file, id_token)
     except KeyError as e:
         logging.error('The metadata or file was missing. Full error : %s', e)
 
@@ -49,9 +50,10 @@ def update_snippet(inflight_request):
     '''
     snippet = None
     try:
-        body = inflight_request.files['data']
+        body = inflight_request.form['data']
         file = inflight_request.files['file'] if 'file' in inflight_request.files else None
-        snippet = mgr.update_snippet(body, file)
+        id_token = request.headers.get("token", None)
+        snippet = mgr.update_snippet(body, file, id_token)
     except KeyError as e:
         logging.error('The metadata was missing for updating the snippet. Full error %s' , e)
 
@@ -73,7 +75,7 @@ def remove_snippet(inflight_request):
     except Error:
         return Response(MessageFormat().error_message('Bad Request. Key does not exist', 400),400)
 
-@snippet_blueprint.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@snippet_blueprint.route('', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @authorization
 def snippet_ops():
     '''Snippet Operations'''
