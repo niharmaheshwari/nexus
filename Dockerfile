@@ -1,4 +1,15 @@
-# For more information, please refer to https://aka.ms/vscode-docker-python
+
+# Stage 1 : UI Build
+FROM node:17 as builder
+
+COPY ./src/client/* .
+
+CMD npm run deploy
+RUN ls
+WORKDIR /ui
+COPY . /ui
+
+# Stage 2 : Hosting
 FROM python:3
 
 EXPOSE 5000
@@ -17,10 +28,12 @@ RUN python -m pip install -r requirements.txt
 WORKDIR /app
 COPY . /app
 
+COPY --from=builder /ui/* /app/src/client/
+
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["python", "-m", "src.app" "-p" "5000"]
+CMD python -m src.app -s 0.0.0.0 -p 5000

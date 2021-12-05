@@ -1,12 +1,8 @@
 '''Main Module'''
 import argparse
 from flask import Flask
-<<<<<<< HEAD
 import logging
-=======
 from flask_cors import CORS
-import src.utilities.logging as log
->>>>>>> development
 from src.views.snippet_view import snippet_blueprint
 from src.views.test_view import test
 from src.views.authentication import auth
