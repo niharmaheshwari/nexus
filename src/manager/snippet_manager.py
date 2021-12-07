@@ -214,6 +214,11 @@ class SnippetManager():
                 'ContentType': 'text/plain'
             })
 
+            # 8. Update shares list
+            shares_old = snippet.shares
+            shares_new = snippet_raw['shares'] if 'shares' in snippet_raw else None
+            snippet.shares = shares_new
+
             # 9. Add metadata to Dynamo
             snippet = merge_snippet(self.get_snippet(snippet.id), snippet)
             self.table.put_item(Item=snippet.to_dict(), ReturnValues='ALL_OLD')
@@ -227,6 +232,8 @@ class SnippetManager():
             )
             # TODO : Put the real user here. I dont have permission
             self.es.index(index = snippet_raw['email'], doc_type = 'snippet', id = snapshot.id, body = snapshot.to_dict())
+
+            self.update_snippet_shares(shares_old, shares_new, snapshot)
 
         except Exception as e:
             logging.error('There was an exception during upload.')
@@ -315,4 +322,19 @@ class SnippetManager():
             snippets_list.append(snippet)
 
         return snippets_list
+
+    def update_snippet_shares(self, shares_old, shares_new, snapshot):
+        if shares_new is None:
+            shares_new = []
+        if shares_old is None:
+            shares_old = []
+
+        removed = list(set(shares_old) - set(shares_new))
+        added = list(set(shares_new) - set(shares_old))
+
+        for user in added:
+            self.es.index(index=user, doc_type='snippet', body=snapshot.to_dict())
+
+        for user in removed:
+            self.es.indices.delete(index=user, ignore=[400, 404])
 

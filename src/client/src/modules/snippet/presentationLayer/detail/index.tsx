@@ -61,7 +61,7 @@ const SnippetDetailView = (props: any) => {
                             ? <>
                                 <ul>
                                     {
-                                        snippet.tags.map((item, idx) => {
+                                        snippet.shares.map((item, idx) => {
                                             return <li key={idx+item}>{item}</li>
                                         })
                                     }
