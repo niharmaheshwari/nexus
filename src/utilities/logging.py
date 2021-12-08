@@ -2,6 +2,9 @@
 General purpose logging utility
 '''
 import logging
+from functools import wraps
+from flask import request
+
 
 LOG_LEVELS = {
     'CRITICAL' : logging.CRITICAL,
@@ -36,15 +39,38 @@ def init_log(root, log_level = logging.INFO):
     if root.handlers:
         for handler in root.handlers:
             root.removeHandler(handler)
-    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',level=log_level)
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'\
+                                                                    ,level=log_level)
 
-def get_logger(log_level = logging.INFO):
+def get_logger(module_name, log_level = logging.INFO):
     '''
     Utility to get the global logger
     Arguments:
+        module_name: str, the name of the module in which the logger
+        object is created.
         log_level : Parameter that sets the global logging level
     '''
     # Set global root logging context
-    root = logging.getLogger()
+    root = logging.getLogger().getChild(module_name)
     init_log(root, log_level)
     return logging.getLogger()
+
+def logger(func):
+    """
+    Decorator function for printing inital log statements
+    about any REST call.
+    """
+    @wraps(func)
+    def default_logger(*args, **kwargs):
+        """
+        Wrapper logger function for printing initial logging
+        statements. Prints the method, url, headers and body
+        of the request.
+        """
+        log = get_logger(module_name=__name__)
+        log.info("http method: %s", request.method)
+        log.info("request url: %s", request.url )
+        log.info("request headers: %s", request.headers)
+        log.info("request body: %s", request.get_json())
+        return func(*args, **kwargs)
+    return default_logger
