@@ -43,7 +43,7 @@ class TestLinting(TestCase):
         rsp, err = lint.get_lint_output('123')
         self.assertIsNone(err)
         self.assertIsNotNone(rsp)
-    
+
     @mock.patch(get_snippet_location, 
     return_value=Snippet(lang='java', uri='http://www.binarySearch.java'))
     @mock.patch('src.manager.linting.linting_manager.run_cpp_script', return_value='java output')

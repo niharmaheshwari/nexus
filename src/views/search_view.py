@@ -3,6 +3,7 @@ from flask import (Blueprint, request, jsonify)
 from src.manager.search_manager import SearchManager
 from src.utilities.authorization import authorization
 from src.model.message_format import MessageFormat
+from src.utilities.logging import logger
 
 search = Blueprint('search', __name__, url_prefix='/api/search')
 
@@ -10,6 +11,7 @@ search_manager = SearchManager()
 
 @search.route('', methods=['POST'])
 @authorization
+@logger
 def search_general():
     '''
     The body will be a json object:

@@ -4,9 +4,13 @@ Linting Manager
 from subprocess import Popen, PIPE
 from src.manager.snippet_manager import SnippetManager
 from src.model.message_format import MessageFormat
+import src.utilities.logging as log
+
+logger = log.get_logger(__name__)
 
 def run_python_script(uri):
     '''Function that runs pylint and returns the stdout'''
+    logger.info("running python script...")
     with Popen(['bash','./src/manager/linting/python_lint.sh', uri],
                stdout=PIPE, stderr=PIPE) as session:
         stdout, _ = session.communicate()
@@ -14,6 +18,7 @@ def run_python_script(uri):
 
 def run_cpp_script(uri):
     '''function that runs cpplint and returns the stderr'''
+    logger.info("running cpp script...")
     with Popen(['bash','./src/manager/linting/cpp_lint.sh', uri],
      stdout=PIPE, stderr=PIPE) as session:
         _, stderr = session.communicate()
@@ -21,6 +26,7 @@ def run_cpp_script(uri):
 
 def run_java_script(uri):
     '''function that runs javac and returns the stderr'''
+    logger.info("running cpp script...")
     with Popen(['bash','./src/manager/linting/java_compile.sh', uri],
     stdout=PIPE, stderr=PIPE) as session:
         _, stderr = session.communicate()

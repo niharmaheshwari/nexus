@@ -7,7 +7,9 @@ from src.manager.snippet_manager import SnippetManager
 from src.manager.user_manager import UserManager
 from src.model.message_format import MessageFormat
 from src.utils.utils import CustomJSONEncoder
+import src.utilities.logging as log
 
+logger = log.get_logger(__name__)
 
 class SearchManager():
     '''
@@ -24,7 +26,7 @@ class SearchManager():
         This method returns a MessageFormat containing search results or an error
         '''
 
-        # Get snippet snapshot information
+        logger.info("retrieving matching snippetSnapshots...")
         snippet_snapshots, err = self.snippet_snapshot_manager.search_by_string(
             search_string, email)
         if err is not None:
@@ -32,9 +34,10 @@ class SearchManager():
         if snippet_snapshots == []:
             return MessageFormat().success_message(data={"snippets":[]})
 
+        logger.info("extracting IDs from matched snippetSnapshots...")
         ids = SearchManager.extract_ids_from_snapshots(snippet_snapshots)
 
-        # Get snippets
+        logger.info("Getting snippets from snippetSnapshots...")
         snippets_response = self.snippet_manager.get_snippets(ids)
         if snippets_response["error"] is True:
             return snippets_response
