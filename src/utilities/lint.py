@@ -1,9 +1,9 @@
 import argparse
-import src.utilities.logging as log
+import logging
 from pylint.lint import Run
 
-
-logging = log.get_logger(__name__)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 parser = argparse.ArgumentParser(prog="LINT")
 
@@ -27,7 +27,7 @@ args = parser.parse_args()
 path = str(args.path)
 threshold = float(args.threshold)
 
-logging.info('PyLint Starting | '
+logger.info('PyLint Starting | '
              'Path: {} | '
              'Threshold: {} '.format(path, threshold))
 
@@ -41,7 +41,7 @@ if final_score < threshold:
                'Score: {} | '
                'Threshold: {} '.format(final_score, threshold))
 
-    logging.error(message)
+    logger.error(message)
     raise Exception(message)
 
 else:
@@ -49,6 +49,6 @@ else:
                'Score: {} | '
                'Threshold: {} '.format(final_score, threshold))
 
-    logging.info(message)
+    logger.info(message)
 
     exit(0)
