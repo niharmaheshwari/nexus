@@ -324,6 +324,13 @@ class SnippetManager():
         return snippets_list
 
     def update_snippet_shares(self, shares_old, shares_new, snapshot):
+        '''
+        Updates the users with whom the snippet has been shared
+        Arguments
+            shares_old : List of people with whom the snippet was shared previously
+            shares_new: List of people with whom the snippet has to be shared with
+            snapshot: Snippet Snapshot to be indexed in elastic search
+        '''
         if shares_new is None:
             shares_new = []
         if shares_old is None:
