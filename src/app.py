@@ -12,7 +12,7 @@ from src.views.client_view import client
 from src.views.lint_view import lint
 import src.constants.constants as const
 
-logger = log.get_logger()
+logger = log.get_logger(__name__)
 
 def register():
     '''
@@ -23,7 +23,8 @@ def register():
     Returns:
         the flask application context
     '''
-    app = Flask(const.NAME, static_folder="src/client/build/static", template_folder="src/client/build")
+    app = Flask(const.NAME, static_folder="src/client/build/static",
+                template_folder="src/client/build")
     CORS(app)
     app.register_blueprint(client)
     app.register_blueprint(snippet_blueprint)
