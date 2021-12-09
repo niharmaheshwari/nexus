@@ -214,16 +214,16 @@ class SnippetManager():
                 'ContentType': 'text/plain'
             })
 
-            # 8. Update shares list
+            # 9. Update shares list
             shares_old = snippet.shares
             shares_new = snippet_raw['shares'] if 'shares' in snippet_raw else None
             snippet.shares = shares_new
 
-            # 9. Add metadata to Dynamo
+            # 10. Add metadata to Dynamo
             snippet = merge_snippet(self.get_snippet(snippet.id), snippet)
             self.table.put_item(Item=snippet.to_dict(), ReturnValues='ALL_OLD')
 
-            # 10. Index in Elastic
+            # 11. Index in Elastic
             snapshot = SnippetSnapshot(
                 snippit_id=snippet.id,
                 tags=snippet.tags,
