@@ -343,5 +343,4 @@ class SnippetManager():
             self.es.index(index=user, doc_type='snippet', body=snapshot.to_dict())
 
         for user in removed:
-            self.es.indices.delete(index=user, ignore=[400, 404])
-
+            self.es.indices.delete(index=user)
