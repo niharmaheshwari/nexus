@@ -1,8 +1,8 @@
 '''Main Module'''
 import argparse
 from flask import Flask
-import logging
 from flask_cors import CORS
+import src.utilities.logging as log
 from src.views.snippet_view import snippet_blueprint
 from src.views.test_view import test
 from src.views.authentication import auth
@@ -11,17 +11,7 @@ from src.views.search_view import search
 from src.views.client_view import client
 import src.constants.constants as const
 
-logger = logging.getLogger()
-
-levels = {
-    'CRITICAL': logging.CRITICAL,
-    'FATAL': logging.FATAL,
-    'ERROR': logging.ERROR,
-    'WARNING': logging.WARNING,
-    'INFO': logging.INFO,
-    'DEBUG': logging.DEBUG,
-    'NOTSET': logging.NOTSET
-}
+logger = log.get_logger(__name__)
 
 def register():
     '''
@@ -32,7 +22,8 @@ def register():
     Returns:
         the flask application context
     '''
-    app = Flask(const.NAME, static_folder="src/client/build/static", template_folder="src/client/build")
+    app = Flask(const.NAME, static_folder="src/client/build/static",
+                template_folder="src/client/build")
     CORS(app)
     app.register_blueprint(client)
     app.register_blueprint(snippet_blueprint)
@@ -71,7 +62,7 @@ def parse_args():
     )
     arguments = parser.parse_args()
     arguments.debug = arguments.debug == 'True'
-    arguments.log = levels[arguments.log]
+    arguments.log = log.LOG_LEVELS[arguments.log]
     return arguments
 
 
@@ -79,5 +70,5 @@ if __name__ == '__main__':
     args = parse_args()
     logger.info('Starting the flask server with the following arguments:')
     logger.info('Flask Debugging: %s', format(args.debug))
-    logger.info('Log Level: %s', logging.getLevelName(args.log))
+    logger.info('Log Level: %s', log.get_level_name(args.log))
     register().run(debug=args.debug, host=args.server, port=args.port)
