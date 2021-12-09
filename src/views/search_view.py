@@ -13,18 +13,16 @@ search_manager = SearchManager()
 def search_general():
     '''
     The body will be a json object:
-    {"search_string": "looking for a python string", "email":"tom@gmail.com"}
+    {"search_string": "looking for a python string", "user":"tom@gmail.com"}
     Matching will be applied to tags, description, and lang fields
     '''
     # Extract POST body parameters
     try:
         search_string = request.json['search_string']
-        email = request.json['email']
+        user = request.json['user']
     except KeyError:
-        msg = "key error: body should contain search_string, email"
+        msg = "key error: body should contain search_string, user"
         return jsonify(MessageFormat().error_message(msg))
-    rsp = search_manager.search_general(search_string, email)
+    rsp = search_manager.search_general(search_string, user)
     return jsonify(rsp)
-
-
     

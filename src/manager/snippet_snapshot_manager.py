@@ -7,6 +7,8 @@ from requests_aws4auth import AWS4Auth
 from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY
 from src.constants.constants import AWS_REGION, ELASTIC_SEARCH, ES_SERVICE
 from src.model.snippet_snapshot import SnippetSnapshot
+from src.model.message_format import MessageFormat
+
 
 class SnippetSnapshotManager():
     '''
@@ -14,26 +16,25 @@ class SnippetSnapshotManager():
     '''
 
     def __init__(self):
-        creds = boto3.Session(ACCESS_KEY, SECRET_ACCESS_KEY,
+        self._creds = boto3.Session(ACCESS_KEY, SECRET_ACCESS_KEY,
                               region_name=AWS_REGION).get_credentials()
-        awsauth = AWS4Auth(creds.access_key, creds.secret_key, AWS_REGION, 
-        ES_SERVICE, session_token=creds.token)
+        self._awsauth = AWS4Auth(self._creds.access_key, self._creds.secret_key, AWS_REGION,
+        ES_SERVICE, session_token=self._creds.token)
 
         # connect to ES
-        self._es = OpenSearch([ELASTIC_SEARCH],http_auth=awsauth, use_ssl = True,
+        self._es = OpenSearch([ELASTIC_SEARCH],http_auth=self._awsauth, use_ssl = True,
         verify_certs=True, connection_class=RequestsHttpConnection)
 
-    def search_by_string(self, search_string, email) -> list:
+    def search_by_string(self, search_string, email):
         '''
         General search: search through tags and description using a search string
 
         Inputs: search_string = "python code to do binary search"
                 user = example "user2"
         Returns: list of snippetSnapshots that match the search_string in either tags,
-         desc, or lang fields
+         desc, and error.
         '''
-
-        # compose query for ES
+        #response = self.get_es_response(search_string, email)
         query = {"query" : {
                 "multi_match" : {
                     "query": search_string,
@@ -41,30 +42,16 @@ class SnippetSnapshotManager():
                 }
             }
         }
+        try:
+            response = self._es.search(
+                body = query,
+                index = email
+            )
+        # pylint: disable=broad-except
+        except Exception as err:
+            return None, MessageFormat().error_message(str(err))
 
-        # search using query
-        response = self._es.search(
-            body = query,
-            index = email
-        )
-
-       # deserialized response to list of snippetSnapshots
-        return SnippetSnapshotManager.es_result_to_snippet_snapshots(response)
-
-    def match_all(self):
-        '''
-        Returns all information in es database, for testing purposes
-        '''
-        query = {"query" : {
-                "match_all" : {}
-            }
-        }
-
-        response = self._es.search(
-            body = query,
-        )
-
-        return response
+        return SnippetSnapshotManager.es_result_to_snippet_snapshots(response), None
 
     @staticmethod
     def es_result_to_snippet_snapshots(response):
@@ -81,3 +68,6 @@ class SnippetSnapshotManager():
             snippet_list.append(snapshot)
         return snippet_list
 
+s = SnippetSnapshotManager()
+#pprint(s.match_all())
+(s.search_by_string("dsfsdf", 'nm3223@columbia.edu'))
