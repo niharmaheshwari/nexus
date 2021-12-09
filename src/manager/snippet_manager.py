@@ -1,16 +1,15 @@
 '''
 Snippet Manager
 '''
-import logging
 import json
 import boto3
 import datetime
 import uuid
-from boto3.dynamodb.conditions import Key, Attr
-import flask
+from boto3.dynamodb.conditions import Key
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 import src.constants.constants as const
+import src.utilities.logging as log
 from src.model.snippet import Snippet
 from src.model.snippet_snapshot import SnippetSnapshot
 from src.manager.user_manager import UserManager
@@ -20,6 +19,8 @@ from src.model.audit import Audit
 from src.model.message_format import MessageFormat
 from src.constants.constants import AWS_REGION, SNIPPET_TABLE
 from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY
+
+logging = log.get_logger(__name__)
 
 LANG_EXTENTION = {
     'py': 'Python',
@@ -34,33 +35,34 @@ class SnippetManager():
     Builder class for Snippets
     '''
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         '''
         Restrict s3 client and table. These should be initialized once and not modified
         '''
-        self._session = boto3.Session(
+
+        self._session = kwargs.get('session',boto3.Session(
             aws_access_key_id=ACCESS_KEY,
             aws_secret_access_key=SECRET_ACCESS_KEY,
-        )
-        self._db_client = self._session.resource(const.DB, region_name=const.AWS_REGION)
-        self._table = self._db_client.Table(const.SNIPPET_TABLE)
-        self._fs = self._session.client(const.FILE_SYSTEM)
-        self._user = UserManager()
-        self._creds = self._session.get_credentials()
-        self._awsauth = AWS4Auth(
+        ))
+        self._db_client = kwargs.get('db_client', self._session.resource(const.DB, region_name=const.AWS_REGION))
+        self._table = kwargs.get('table', self._db_client.Table(const.SNIPPET_TABLE))
+        self._fs = kwargs.get('fs', self._session.client(const.FILE_SYSTEM))
+        self._user = kwargs.get('user', UserManager())
+        self._creds = kwargs.get('creds', self._session.get_credentials())
+        self._awsauth = kwargs.get('awsauth', AWS4Auth(
             self._creds.access_key,
             self._creds.secret_key,
             const.AWS_REGION,
             'es',
             session_token=self._creds.token
-        )
-        self._es = OpenSearch(
+        ))
+        self._es = kwargs.get('es', OpenSearch(
             hosts = [const.ELASTIC_SEARCH],
             http_auth = self._awsauth,
             use_ssl = True,
             verify_certs = True,
             connection_class = RequestsHttpConnection
-        )
+        ))
 
     @property
     def table(self):
@@ -88,7 +90,7 @@ class SnippetManager():
         If a snippet ID is not passed, fetch all snippets for a specific user. Note that this
         fetches even those sinppets which are shared with the user.
         :params:
-            snipped_id: ID for the snipped to be fetched (Optional)
+            snippet_id: ID for the snipped to be fetched (Optional)
             token: Token for the user
         :returns:
             result: A single Snippet OR a list of Snippets

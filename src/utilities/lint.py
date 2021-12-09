@@ -1,9 +1,9 @@
 import argparse
-import logging
+import src.utilities.logging as log
 from pylint.lint import Run
 
 
-logging.getLogger().setLevel(logging.INFO)
+logging = log.get_logger(__name__)
 
 parser = argparse.ArgumentParser(prog="LINT")
 
