@@ -2,7 +2,7 @@
 # Stage 1 : UI Build
 FROM node:17 as builder
 
-COPY ./src/client/* .
+COPY ./src/client/* ./
 
 CMD npm run deploy
 RUN ls
