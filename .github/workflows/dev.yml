@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - '40-cicd-nm3223'
+      - 'development'
 jobs:
   lint:
     runs-on: ubuntu-latest
