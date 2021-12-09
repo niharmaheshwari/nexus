@@ -26,7 +26,7 @@ def run_cpp_script(uri):
 
 def run_java_script(uri):
     '''function that runs javac and returns the stderr'''
-    logger.info("running cpp script...")
+    logger.info("running java script...")
     with Popen(['bash','./src/manager/linting/java_compile.sh', uri],
     stdout=PIPE, stderr=PIPE) as session:
         _, stderr = session.communicate()

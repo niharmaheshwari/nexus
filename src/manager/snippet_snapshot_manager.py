@@ -8,9 +8,7 @@ from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY
 from src.constants.constants import AWS_REGION, ELASTIC_SEARCH, ES_SERVICE
 from src.model.snippet_snapshot import SnippetSnapshot
 from src.model.message_format import MessageFormat
-import src.utilities.logging as log
 
-logger = log.get_logger(__name__)
 
 class SnippetSnapshotManager():
     '''
@@ -36,7 +34,7 @@ class SnippetSnapshotManager():
         Returns: list of snippetSnapshots that match the search_string in either tags,
          desc, and error.
         '''
-        logger.info("searching in ES...")
+
         query = {"query" : {
                 "multi_match" : {
                     "query": search_string,
@@ -58,8 +56,6 @@ class SnippetSnapshotManager():
     @staticmethod
     def es_result_to_snippet_snapshots(response):
         '''deserialize es response to list of snippetSnapshots'''
-
-        logger.info("deserializing ES response to snippetSnapshot list...")
 
         result = response['hits']['hits']
         snippet_list = []

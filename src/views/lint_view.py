@@ -1,7 +1,6 @@
 '''lint View'''
-import logging
 from src.manager.linting import linting_manager
-from flask import (Blueprint, request, Response, jsonify)
+from flask import (Blueprint, Response, jsonify)
 from src.manager.snippet_manager import SnippetManager
 from src.utilities.authorization import authorization
 from src.utilities.logging import logger
