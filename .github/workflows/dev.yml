@@ -49,6 +49,7 @@ jobs:
           echo "Publishing Results to S3"
           python -m src.utilities.coverage_delivery
   deploy:
+    needs: [lint, test]
     runs-on: ubuntu-latest
     steps:
       - run: echo "Attempting to build a docker image"
