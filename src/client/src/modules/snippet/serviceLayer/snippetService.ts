@@ -34,6 +34,19 @@ class SnippetService {
         return response;
     }
 
+    async fetchLintResults(id: string) {
+        const relative_url = "lint/" + id;
+        const response = await networkLayer.apiRequest("get",
+            relative_url,
+            undefined,
+            undefined,
+            undefined,
+            false
+            )
+        console.log("Fetch snippet linting report:", JSON.stringify(response));
+        return response;
+    }
+
     async deleteSnippet(id: string) {
         const queryParameters = {
             id
