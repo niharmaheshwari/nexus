@@ -2,12 +2,11 @@
 Test cases for user authentication and authorization
 """
 from datetime import datetime, timedelta
-import time
 import unittest
 from unittest.mock import Mock
 from botocore.stub import Stubber
 from jose import jwt
-from src.constants.secrets import CLIENT_ID, KEYS_URL
+from src.constants.secrets import CLIENT_ID
 from src.manager.user_manager import UserManager
 from src.utilities.authentication_utils import find_public_key, \
             get_keys, is_audience_valid, is_token_expired, serialize_user_object
@@ -323,43 +322,64 @@ class TestAuthentication(unittest.TestCase):
         self.assertEqual("success", response["message"])
         self.assertFalse(response["error"])
         self.assertTrue(response["success"])
-    
+
     # authentication utils error
     def test_invalid_public_key_not_found(self):
+        """
+        Tests if public key is not found in cognito
+        """
         key_id = "sample"
         key_list = get_keys()
         response = find_public_key(key_id, key_list)
         self.assertEqual(response, -1)
-    
+
     def test_valid_public_key_found(self):
+        """
+        Tests for a valid public key
+        """
         key_id = "n59PyjVWe1jjiJ0mAJQPP5eUjH4jPNbDwltff0144U4="
         key_list = get_keys()
         response = find_public_key(key_id, key_list)
         self.assertEqual(response, 0)
-    
+
     def test_token_expired(self):
+        """
+        Tests when the token has expired
+        """
         claims = {'exp': 13}
         response = is_token_expired(claims)
         self.assertTrue(response)
-    
+
     def test_token_not_expired(self):
+        """
+        Tests when the token has not expired
+        """
         datetime_time = datetime.now() + timedelta(days=1)
         timestamp = datetime.timestamp(datetime_time)
         claims = {'exp': timestamp}
         response = is_token_expired(claims)
         self.assertFalse(response)
-    
+
     def test_invalid_claims(self):
+        """
+        Tests with invalid claims
+        """
         claims = {'aud': "sample"}
         response = is_audience_valid(claims)
         self.assertFalse(response)
 
     def test_valid_claims(self):
+        """
+        Tests with valid claims
+        """
         claims = {'aud': CLIENT_ID}
         response = is_audience_valid(claims)
         self.assertTrue(response)
 
     def test_user_serialization(self):
+        """
+        Tests user serialization
+        """
         user = User()
         user.set_user_id("uid")
         user.set_name("sample")
