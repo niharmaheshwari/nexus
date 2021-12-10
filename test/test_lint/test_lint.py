@@ -26,7 +26,7 @@ class TestLinting(TestCase):
         self.assertIsNone(rsp)
 
     @mock.patch(get_snippet_location, 
-    return_value=Snippet(lang='python', uri='http://www.binarySearch.py'))
+    return_value=Snippet(lang='python', uri='binarysearch.python'))
     @mock.patch('src.manager.linting.linting_manager.run_python_script',
     return_value='pylint output')
     def test_happy_path_python(self, mock1, mock2):
@@ -36,7 +36,7 @@ class TestLinting(TestCase):
         self.assertIsNotNone(rsp)
 
     @mock.patch(get_snippet_location, 
-    return_value=Snippet(lang='c++', uri='http://www.binarySearch.cpp'))
+    return_value=Snippet(lang='c++', uri='binarysearch.cpp'))
     @mock.patch('src.manager.linting.linting_manager.run_cpp_script', return_value='cpp output')
     def test_happy_path_cpp(self, mock1, mock2):
         '''testing linting in cpp'''
@@ -45,7 +45,7 @@ class TestLinting(TestCase):
         self.assertIsNotNone(rsp)
 
     @mock.patch(get_snippet_location, 
-    return_value=Snippet(lang='java', uri='http://www.binarySearch.java'))
+    return_value=Snippet(lang='java', uri='binarysearch.java'))
     @mock.patch('src.manager.linting.linting_manager.run_cpp_script', return_value='java output')
     def test_happy_path_java(self, mock1, mock2):
         '''testing static analysis in java'''
