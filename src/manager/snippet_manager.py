@@ -339,13 +339,12 @@ class SnippetManager():
             # There is no benefit to continue from here. Return here
             return snippet, validation
 
-            # 9. Update shares list
-            shares_old = snippet.shares
-            shares_new = snippet_raw['shares'] if 'shares' in snippet_raw else None
-            snippet.shares = shares_new
+        _ = self.get_snippet(snippet.id, token)
+        original_snippet, _ = self.get_snippet(snippet.id, token)
+        shares_old = original_snippet[0].shares
+        shares_new = snippet_raw['shares'] if 'shares' in snippet_raw else None
+        snippet.shares = shares_new
 
-            # 10. Add metadata to Dynamo
-            snippet = merge_snippet(self.get_snippet(snippet.id), snippet)
         try:
             self.table.put_item(Item=snippet.to_dict(), ReturnValues='ALL_OLD')
         except Exception as table_exception:
@@ -428,6 +427,7 @@ class SnippetManager():
                 desc=result[0].desc,
                 lang=result[0].lang
             )
+            self.update_snippet_shares(result[0].shares, [], snapshot)
             self.es.delete(
                 index= result[0].author,
                 id= result[0].id
@@ -513,7 +513,12 @@ class SnippetManager():
         added = list(set(shares_new) - set(shares_old))
 
         for user in added:
-            self.es.index(index=user, doc_type='snippet', body=snapshot.to_dict())
+            self.es.index(index=user,
+                          doc_type='snippet',
+                          body=snapshot.to_dict(),
+                          id=snapshot.id)
 
         for user in removed:
-            self.es.delete(index=user, doc_type='snippet', id=snapshot.id)
+            self.es.delete(index=user,
+                           doc_type='snippet',
+                           id=snapshot.id)
