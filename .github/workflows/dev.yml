@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - '40-cicd-nm3223'
+      - 'added-tests-slj2142'
       - 'development'
 jobs:
   lint:
