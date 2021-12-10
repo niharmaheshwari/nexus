@@ -1,6 +1,10 @@
 '''
 Linting Manager
 '''
+import subprocess
+import sys
+import os
+from urllib.parse import urlparse
 from subprocess import Popen, PIPE
 from src.manager.snippet_manager import SnippetManager
 from src.model.message_format import MessageFormat
@@ -19,11 +23,15 @@ logger = log.get_logger(__name__)
 def run_python_script(uri):
     '''Function that runs pylint and returns the stdout'''
     logger.info("running python script...")
-    session = Popen(['./src/manager/linting/python_lint.sh', uri], stdout=PIPE, stderr=PIPE, shell=False)
-    stdout, _ = session.communicate()
-    return stdout.decode('utf-8')
-    
-print(run_python_script('https://snippets-s.s3.us-east-2.amazonaws.com/binary_search.py'))
+    parsed = urlparse(uri)
+    file_name = os.path.basename(parsed.path)
+    subprocess.run(['wget', uri])
+    cmd2 = subprocess.run(['pylint', file_name], stdout=PIPE)
+    subprocess.run(['rm', file_name])
+    return cmd2.stdout.decode('utf-8')
+
+script = run_python_script('https://snippets-s.s3.us-east-2.amazonaws.com/binary_search.py')
+print("script", script)
 
 def run_cpp_script(uri):
     '''function that runs cpplint and returns the stderr'''
