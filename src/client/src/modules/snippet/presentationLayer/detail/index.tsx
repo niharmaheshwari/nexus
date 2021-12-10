@@ -11,6 +11,7 @@ const SnippetDetailView = (props: any) => {
     let navigate = useNavigate();
     const snippet: Snippet = location.state
     const [code, setCode] = useState(null);
+    const [lint, setLint] = useState(null);
     const [snippetDeleteFailed, setSnippetDeleteFailed] = useState(false);
     console.log(JSON.stringify("On snippet detail page"));
     console.log("SNIPPET AUTHOR:")
@@ -22,6 +23,13 @@ const SnippetDetailView = (props: any) => {
             })
             .catch((error) => {
                 console.log("Snippet fetch failed")
+            })
+        snippetService.fetchLintResults(snippet.id)
+            .then((response) => {
+                setLint(response.data)
+            })
+            .catch((error) => {
+                console.log("Snippet lint results failed to fetch")
             })
     }, [])
     const handleUpdate = () => {
@@ -92,7 +100,13 @@ const SnippetDetailView = (props: any) => {
                         }
                     </Grid>
                     <Grid item xs={8}>
-                        <pre style={{whiteSpace: "pre-wrap"}}>{code}</pre>
+                        <Grid item>
+                            <pre style={{whiteSpace: "pre-wrap"}}>{code}</pre>
+                        </Grid>
+                        <Grid item>
+                            <h3>Linting Results</h3>
+                            <pre style={{whiteSpace: "pre-wrap"}}>{lint}</pre>
+                        </Grid>
                     </Grid>
                 </Grid>
             </NexusCard>
