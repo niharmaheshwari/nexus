@@ -23,7 +23,7 @@ jobs:
       - name: Lint Project
         run: |
           echo "Starting a branch lint on ${{ github.ref }} for ${{ github.repository }}"
-          python src/utilities/lint.py --path ./src --threshold 8.0
+          python -m src.utilities.lint --path ./src --threshold 8.0
   test:
     runs-on: ubuntu-latest
     steps:
@@ -47,7 +47,7 @@ jobs:
           coverage run -m unittest discover
           coverage html --omit="**/Library/*,*__init__.py" -d test/coverage
           echo "Publishing Results to S3"
-          python src/utilities/coverage_delivery.py
+          python -m src.utilities.coverage_delivery
   deploy:
     runs-on: ubuntu-latest
     steps:
