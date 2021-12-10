@@ -1,6 +1,5 @@
 #!/bin/bash
 url=$1
-filename=$(basename "$url")
-wget "$url" &> /dev/null
-cpplint "$filename"
-rm "$filename"
+wget -O file.cpp "$url" &> /dev/null
+cpplint file.cpp
+rm file.cpp
