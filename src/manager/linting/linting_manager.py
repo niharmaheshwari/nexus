@@ -19,12 +19,11 @@ logger = log.get_logger(__name__)
 def run_python_script(uri):
     '''Function that runs pylint and returns the stdout'''
     logger.info("running python script...")
-    with Popen(['bash','./src/manager/linting/python_lint.sh', uri],
-               stdout=PIPE, stderr=PIPE, shell=False) as session:
-        stdout, _ = session.communicate()
-        return stdout.decode('utf-8')
+    session = Popen(['bash','./src/manager/linting/python_lint.sh', uri], stdout=PIPE, stderr=PIPE)
+    stdout, _ = session.communicate()
+    return stdout.decode('utf-8')
     
-#print(run_python_script('https://snippets-s.s3.us-east-2.amazonaws.com/binary_search.py'))
+print(run_python_script('https://snippets-s.s3.us-east-2.amazonaws.com/binary_search.py'))
 
 def run_cpp_script(uri):
     '''function that runs cpplint and returns the stderr'''
