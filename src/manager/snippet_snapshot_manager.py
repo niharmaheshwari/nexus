@@ -67,6 +67,3 @@ class SnippetSnapshotManager():
             snapshot= SnippetSnapshot(snippet_id, tags, desc, lang)
             snippet_list.append(snapshot)
         return snippet_list
-
-s = SnippetSnapshotManager()
-(s.search_by_string("dsfsdf", 'nm3223@columbia.edu'))
