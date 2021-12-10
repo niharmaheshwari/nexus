@@ -38,7 +38,7 @@ class TestSnippetSnapshot(TestCase):
         with mock.patch('src.manager.snippet_snapshot_manager.OpenSearch.search',
          return_value=es_response):
             rsp, err = self.snippet_snapshot_manager.search_by_string(
-                'binary search','nm3223@columbia.edu')
+                'bs','nm3223@columbia.edu')
         self.assertIsInstance(rsp[0],SnippetSnapshot)
         self.assertIsNone(err)
 
@@ -46,7 +46,7 @@ class TestSnippetSnapshot(TestCase):
     def test_get_snippet_snapshots_fail(self, mock1):
         '''tests searching when invalid id is inputted'''
         mock1.side_effect = Exception()
-        rsp, err = self.snippet_snapshot_manager.search_by_string('binary search', 'invalidID')
+        rsp, err = self.snippet_snapshot_manager.search_by_string('searching for bs', 'invalidID')
         self.assertIsNone(rsp)
         self.assertTrue(err['error'])
 
