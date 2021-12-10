@@ -4,6 +4,7 @@ import {home} from "../../../dashboard/presentationLayer/dashboard/style";
 import NexusCard from "../../../core/components/nexusCard";
 import {Button, Grid} from "@mui/material";
 import snippetService from "../../serviceLayer/snippetService";
+import userProfile from "../../../user/serviceLayer/userProfile";
 import React, {useEffect, useState} from "react";
 const SnippetDetailView = (props: any) => {
     let location = useLocation();
@@ -12,6 +13,7 @@ const SnippetDetailView = (props: any) => {
     const [code, setCode] = useState(null);
     const [snippetDeleteFailed, setSnippetDeleteFailed] = useState(false);
     console.log(JSON.stringify("On snippet detail page"));
+    console.log("SNIPPET AUTHOR:")
     useEffect(() => {
         snippetService.fetchSnippet(snippet.uri)
             .then((response) => {
@@ -69,18 +71,21 @@ const SnippetDetailView = (props: any) => {
                             </>
                             : <p>This snippet is not shared with anybody</p>
                         }
-                        <Grid style={{paddingTop: "10px", paddingBottom: "10px"}} container alignItems="center" direction="row" justifyContent="flex-start" spacing={2}>
-                            <Grid item>
-                                <Button variant="contained" color="secondary" onClick={handleUpdate}>
-                                    UPDATE
-                                </Button>
+                        {userProfile.email === snippet.author
+                            ? <Grid style={{paddingTop: "10px", paddingBottom: "10px"}} container alignItems="center" direction="row" justifyContent="flex-start" spacing={2}>
+                                <Grid item>
+                                    <Button variant="contained" color="secondary" onClick={handleUpdate}>
+                                        UPDATE
+                                    </Button>
+                                </Grid>
+                                <Grid item>
+                                    <Button variant="contained" color="secondary" onClick={handleDelete}>
+                                        DELETE
+                                    </Button>
+                                </Grid>
                             </Grid>
-                            <Grid item>
-                                <Button variant="contained" color="secondary" onClick={handleDelete}>
-                                    DELETE
-                                </Button>
-                            </Grid>
-                        </Grid>
+                            : <></>
+                        }
                         {snippetDeleteFailed
                             ? <p style={{color: "red"}}>Failed to delete the snippet</p>
                             : <></>

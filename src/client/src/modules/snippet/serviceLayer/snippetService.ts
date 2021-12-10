@@ -65,7 +65,10 @@ class SnippetService {
             return Promise.reject("User email not defined")
         }
         const tagsList = tags.split(",")
-        const shareList = shares.split(",")
+        let shareList: string[] = []
+        if (shares !== "") {
+            shareList = shares.split(",")
+        }
         const requestParams = new SnippetUpdateRequestParams(id, description, tagsList, shareList, userProfile.email)
         return await networkLayer.uploadFile("put",
             "snippet",
