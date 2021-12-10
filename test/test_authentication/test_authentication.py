@@ -1,12 +1,17 @@
 """
 Test cases for user authentication and authorization
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 import unittest
 from unittest.mock import Mock
 from botocore.stub import Stubber
 from jose import jwt
+from src.constants.secrets import CLIENT_ID
 from src.manager.user_manager import UserManager
+from src.utilities.authentication_utils import find_public_key, \
+            get_keys, is_audience_valid, is_token_expired, serialize_user_object
+from src.model.user import User
+
 
 class TestAuthentication(unittest.TestCase):
     """
@@ -204,6 +209,68 @@ class TestAuthentication(unittest.TestCase):
         self.assertFalse(response["error"])
         self.assertTrue(response["success"])
 
+    # refresh token flow
+    def test_refresh_token_missing_params(self):
+        """
+        Tests missing parameters for generating new tokens
+        """
+        parameters = {}
+        response = self.user_manager.generate_new_token(parameters)
+        self.assertEqual("email is not present", response["message"])
+        self.assertTrue(response["error"])
+
+    def test_refresh_token_invalid_token(self):
+        """
+        Tests invalid token/email for generating new tokens
+        """
+        parameters = {"email": "sample@gmail.com", "refresh_token": "xxxx"}
+        self.stubber.add_client_error("initiate_auth", "NotAuthorizedException")
+        self.stubber.activate()
+        response = self.user_manager.generate_new_token(parameters)
+        self.assertEqual("Invalid email/token", response["message"])
+        self.assertTrue(response["error"])
+
+    def test_refresh_token_user_not_confirmed(self):
+        """
+        Tests whether the user is confirmed or not for generating new tokens
+        """
+        parameters = {"email": "sample@gmail.com", "refresh_token": "xxxx"}
+        self.stubber.add_client_error("initiate_auth", "UserNotConfirmedException")
+        self.stubber.activate()
+        response = self.user_manager.generate_new_token(parameters)
+        self.assertEqual("User is not confirmed", response["message"])
+        self.assertTrue(response["error"])
+
+    def test_refresh_token_success(self):
+        """
+        Happy path flow for generate_refresh_tokens
+        """
+        parameters = {"email": "sample@gmail.com", "refresh_token": "xxxx"}
+        service_response = {
+            'ChallengeName': 'SMS_MFA',
+            'Session': 'xxxxxxxxxxxxxxxxxxxx',
+            'ChallengeParameters': {
+                'string': 'string'
+            },
+            'AuthenticationResult': {
+                'AccessToken': 'string',
+                'ExpiresIn': 123,
+                'TokenType': 'string',
+                'RefreshToken': 'string',
+                'IdToken': 'string',
+                'NewDeviceMetadata': {
+                    'DeviceKey': 'string',
+                    'DeviceGroupKey': 'string'
+                }
+            }
+        }
+        self.stubber.add_response("initiate_auth", service_response)
+        self.stubber.activate()
+        response = self.user_manager.generate_new_token(parameters)
+        self.assertEqual("success", response["message"])
+        self.assertFalse(response["error"])
+        self.assertTrue(response["success"])
+
     # fetch user details flow
 
     def test_get_user_details_invalid_user(self):
@@ -255,6 +322,81 @@ class TestAuthentication(unittest.TestCase):
         self.assertEqual("success", response["message"])
         self.assertFalse(response["error"])
         self.assertTrue(response["success"])
+
+    # authentication utils error
+    def test_invalid_public_key_not_found(self):
+        """
+        Tests if public key is not found in cognito
+        """
+        key_id = "sample"
+        key_list = get_keys()
+        response = find_public_key(key_id, key_list)
+        self.assertEqual(response, -1)
+
+    def test_valid_public_key_found(self):
+        """
+        Tests for a valid public key
+        """
+        key_id = "n59PyjVWe1jjiJ0mAJQPP5eUjH4jPNbDwltff0144U4="
+        key_list = get_keys()
+        response = find_public_key(key_id, key_list)
+        self.assertEqual(response, 0)
+
+    def test_token_expired(self):
+        """
+        Tests when the token has expired
+        """
+        claims = {'exp': 13}
+        response = is_token_expired(claims)
+        self.assertTrue(response)
+
+    def test_token_not_expired(self):
+        """
+        Tests when the token has not expired
+        """
+        datetime_time = datetime.now() + timedelta(days=1)
+        timestamp = datetime.timestamp(datetime_time)
+        claims = {'exp': timestamp}
+        response = is_token_expired(claims)
+        self.assertFalse(response)
+
+    def test_invalid_claims(self):
+        """
+        Tests with invalid claims
+        """
+        claims = {'aud': "sample"}
+        response = is_audience_valid(claims)
+        self.assertFalse(response)
+
+    def test_valid_claims(self):
+        """
+        Tests with valid claims
+        """
+        claims = {'aud': CLIENT_ID}
+        response = is_audience_valid(claims)
+        self.assertTrue(response)
+
+    def test_user_serialization(self):
+        """
+        Tests user serialization
+        """
+        user = User()
+        user.set_user_id("uid")
+        user.set_name("sample")
+        user.set_phone_number("123")
+        user.set_email("sample@gmail.com")
+        user.set_birth_date("05/03/1997")
+
+        serialized_user = [
+            {"Name": "sub", "Value": "uid"},
+            {"Name": "email", "Value": "sample@gmail.com"},
+            {"Name": "name", "Value": "sample"},
+            {"Name": "phone_number", "Value": "123"},
+            {"Name": "birthdate", "Value": "05/03/1997"}
+        ]
+
+        serialized_response = serialize_user_object(user)
+        self.assertListEqual(serialized_response, serialized_user)
 
     def tearDown(self):
         del self.user_manager
