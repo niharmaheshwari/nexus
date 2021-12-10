@@ -5,6 +5,7 @@ on:
       - '40-cicd-nm3223'
       - 'development'
       - 'nm3223-sonar'
+      - 'tykosc-search'
 jobs:
   lint:
     runs-on: ubuntu-latest
