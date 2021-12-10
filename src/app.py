@@ -9,6 +9,7 @@ from src.views.authentication import auth
 from src.views.dummy_view import dummy
 from src.views.search_view import search
 from src.views.client_view import client
+from src.views.lint_view import lint
 import src.constants.constants as const
 
 logger = log.get_logger(__name__)
@@ -31,6 +32,7 @@ def register():
     app.register_blueprint(search)
     app.register_blueprint(auth)
     app.register_blueprint(dummy)
+    app.register_blueprint(lint)
     return app
 
 def parse_args():

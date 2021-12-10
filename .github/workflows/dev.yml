@@ -6,6 +6,7 @@ on:
       - 'added-tests-slj2142'
       - 'development'
       - 'nm3223-sonar'
+      - 'tykosc-search'
 jobs:
   lint:
     runs-on: ubuntu-latest
