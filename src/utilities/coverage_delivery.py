@@ -1,12 +1,12 @@
 '''
 Helper routine for writing the coverage to S3
 '''
-import logging
+import src.utilities.logging as log
 import boto3
 import os
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logging = log.get_logger(__name__)
+logging.setLevel(logging.DEBUG)
 
 session = boto3.Session(
     aws_access_key_id=os.environ['ACCESS_KEY'],
