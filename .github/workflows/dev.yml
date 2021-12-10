@@ -5,6 +5,7 @@ on:
       - '40-cicd-nm3223'
       - 'added-tests-slj2142'
       - 'development'
+      - 'nm3223-sonar'
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -67,5 +68,17 @@ jobs:
           secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
           region: us-east-2
           image: nexus:${GITHUB_REF##*/}
-
-
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      with:
+        projectBaseDir: .
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
