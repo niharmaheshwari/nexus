@@ -242,8 +242,8 @@ class SnippetManager():
                 lang=snippet.lang
             )
             self.es.index(
-                index = snippet.author, 
-                doc_type = 'snippet', 
+                index = snippet.author,
+                doc_type = 'snippet',
                 body = snapshot.to_dict(),
                 id=snippet.id
             )
@@ -339,12 +339,19 @@ class SnippetManager():
             # There is no benefit to continue from here. Return here
             return snippet, validation
 
+        _ = self.get_snippet(snippet.id, token)
+        original_snippet, _ = self.get_snippet(snippet.id, token)
+        shares_old = original_snippet[0].shares
+        shares_new = snippet_raw['shares'] if 'shares' in snippet_raw else None
+        snippet.shares = shares_new
+
         try:
             self.table.put_item(Item=snippet.to_dict(), ReturnValues='ALL_OLD')
         except Exception as table_exception:
             logging.error('Could not add Snippet to Dynamo. Error: %s', table_exception)
             validation.append('Could not add snippet to DynamoDB')
 
+            # 11. Index in Elastic
         try:
             snapshot = SnippetSnapshot(
                 snippit_id=snippet.id,
@@ -357,16 +364,19 @@ class SnippetManager():
                 id= snippet_raw['id']
             )
             self.es.index(
-                index = snippet_raw['email'], 
+                index = snippet_raw['email'],
                 doc_type = 'snippet',
                 id=snippet.id,
                 body = snapshot.to_dict()
             )
+            self.update_snippet_shares(shares_old, shares_new, snapshot)
         except Exception as elastic_fail:
             logging.error('There was an exception while adding the snippet to elastic')
             logging.error('Full Error: %s', elastic_fail)
             logging.warn('There are inconsitencies between S3 / Dynamo / Elastic. Please check')
 
+        except Exception as e:
+            logging.error('There was an exception during upload.')
         return snippet, validation
 
     def delete_snippet(self, id, token):
@@ -417,6 +427,7 @@ class SnippetManager():
                 desc=result[0].desc,
                 lang=result[0].lang
             )
+            self.update_snippet_shares(result[0].shares, [], snapshot)
             self.es.delete(
                 index= result[0].author,
                 id= result[0].id
@@ -485,4 +496,29 @@ class SnippetManager():
 
         return snippets_list
 
+    def update_snippet_shares(self, shares_old, shares_new, snapshot):
+        '''
+        Updates the users with whom the snippet has been shared
+        Arguments
+            shares_old : List of people with whom the snippet was shared previously
+            shares_new: List of people with whom the snippet has to be shared with
+            snapshot: Snippet Snapshot to be indexed in elastic search
+        '''
+        if shares_new is None:
+            shares_new = []
+        if shares_old is None:
+            shares_old = []
 
+        removed = list(set(shares_old) - set(shares_new))
+        added = list(set(shares_new) - set(shares_old))
+
+        for user in added:
+            self.es.index(index=user,
+                          doc_type='snippet',
+                          body=snapshot.to_dict(),
+                          id=snapshot.id)
+
+        for user in removed:
+            self.es.delete(index=user,
+                           doc_type='snippet',
+                           id=snapshot.id)
