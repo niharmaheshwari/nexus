@@ -9,9 +9,10 @@ from jose import jwk, jwt
 from src.utilities.authentication_utils import get_keys, find_public_key, is_audience_valid, \
     is_token_expired, verify_public_key
 from src.model.message_format import MessageFormat
+import src.utilities.logging as log
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger = log.get_logger(__name__)
+
 
 def authorization(func):
     """

@@ -25,6 +25,4 @@ def search_general():
         return jsonify(MessageFormat().error_message(msg))
     rsp = search_manager.search_general(search_string, email)
     return jsonify(rsp)
-
-
     

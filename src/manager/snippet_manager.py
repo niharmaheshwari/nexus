@@ -438,6 +438,23 @@ class SnippetManager():
             logging.warn('There are inconsitencies between S3 / Dynamo / Elastic. Please check')
 
         return result[0], validation
+    
+    def get_snippet_headless(self, snippet_id):
+        '''
+        Get a snippet from DB given a snippet ID
+        Arguments
+            snipped_id: ID for the snipped to be fetched
+        '''
+        snippet = Snippet()
+        try:
+            snippet = Snippet.to_snippet(self.table.query(
+                KeyConditionExpression = Key('id').eq(snippet_id)
+            )['Items'][0])
+            logging.info(f'Snippet Obtained : {snippet}')
+        except Exception as key_error:
+            logging.error(f'Key: {snippet_id} does not exist in the database. Full Error : {key_error}')
+            snippet = None
+        return snippet
 
     def get_snippets(self, snippet_ids):
         '''
@@ -469,29 +486,21 @@ class SnippetManager():
         '''
         snippets_list = []
         for item in response['Responses']['snippets']:
-
             last_upd_user = item['audit']['last_upd_user']
             creation_date = item['audit']['creation_date']
             last_upd_date = item['audit']['last_upd_date']
             creation_user = item['audit']['creation_user']
-            uri = item['uri']
-            snippet_id = item['id']
-            tags = item['tags']
-            shares = item['shares']
-            author = item['author']
-            lang = item['lang']
-            desc = item['desc']
 
             audit = Audit(last_upd_date, last_upd_user, creation_date, creation_user)
             snippet = Snippet()
-            snippet.id = snippet_id
-            snippet.uri = uri
-            snippet.desc = desc
-            snippet.tags = tags
-            snippet.author = author
-            snippet.shares = shares
+            snippet.id = item['id']
+            snippet.uri = item['uri']
+            snippet.desc = item['desc']
+            snippet.tags = item['tags']
+            snippet.author = item['author']
+            snippet.shares = item['shares']
             snippet.audit = audit
-            snippet.lang = lang
+            snippet.lang = item['lang']
             snippets_list.append(snippet)
 
         return snippets_list

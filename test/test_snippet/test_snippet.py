@@ -300,4 +300,4 @@ class TestSnippetView(unittest.TestCase):
         manager.es.index = MagicMock()
         snippet, validation = manager.delete_snippet('user1-snippit-1', 'sdfsdfsdfsdf')
         self.assertIsNotNone(snippet)
-        self.assertEqual(len(validation), 1)
+        self.assertEqual(len(validation), 2)
