@@ -12,26 +12,13 @@ import src.utilities.logging as log
 
 logger = log.get_logger(__name__)
 
-# def run_python_script(uri):
-#     '''Function that runs pylint and returns the stdout'''
-#     logger.info("running python script...")
-#     with Popen(['bash','./src/manager/linting/python_lint.sh', uri],
-#                stdout=PIPE, stderr=PIPE) as session:
-#         stdout, _ = session.communicate()
-#         return stdout.decode('utf-8')
-
 def run_python_script(uri):
     '''Function that runs pylint and returns the stdout'''
     logger.info("running python script...")
-    parsed = urlparse(uri)
-    file_name = os.path.basename(parsed.path)
-    subprocess.run(['wget', uri])
-    cmd2 = subprocess.run(['pylint', file_name], stdout=PIPE)
-    subprocess.run(['rm', file_name])
-    return cmd2.stdout.decode('utf-8')
-
-script = run_python_script('https://snippets-s.s3.us-east-2.amazonaws.com/binary_search.py')
-print("script", script)
+    with Popen(['bash','./src/manager/linting/python_lint.sh', uri],
+               stdout=PIPE, stderr=PIPE) as session:
+        stdout, _ = session.communicate()
+        return stdout.decode('utf-8')
 
 def run_cpp_script(uri):
     '''function that runs cpplint and returns the stderr'''
@@ -62,7 +49,7 @@ def run_linter(lang, uri):
 def get_lint_output(snippet_id):
     '''function that returns lint output for a snippetID and error'''
     manager = SnippetManager()
-    snippet = manager.get_snippet(snippet_id)
+    snippet = manager.get_snippet_headless(snippet_id)
     if snippet is None:
         return None, MessageFormat().error_message("snippet does not exist")
     accepted_langs = ['Python', 'python', 'C++', 'c++', 'java', 'Java']

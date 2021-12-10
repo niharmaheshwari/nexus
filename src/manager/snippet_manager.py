@@ -427,6 +427,23 @@ class SnippetManager():
             logging.warn('There are inconsitencies between S3 / Dynamo / Elastic. Please check')
 
         return result[0], validation
+    
+    def get_snippet_headless(self, snippet_id):
+        '''
+        Get a snippet from DB given a snippet ID
+        Arguments
+            snipped_id: ID for the snipped to be fetched
+        '''
+        snippet = Snippet()
+        try:
+            snippet = Snippet.to_snippet(self.table.query(
+                KeyConditionExpression = Key('id').eq(snippet_id)
+            )['Items'][0])
+            logging.info(f'Snippet Obtained : {snippet}')
+        except Exception as key_error:
+            logging.error(f'Key: {snippet_id} does not exist in the database. Full Error : {key_error}')
+            snippet = None
+        return snippet
 
     def get_snippets(self, snippet_ids):
         '''

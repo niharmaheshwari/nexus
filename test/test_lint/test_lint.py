@@ -9,7 +9,7 @@ import src.manager.linting.linting_manager as lint
 class TestLinting(TestCase):
     '''Class to test linting functionality '''
      # pylint: disable=unused-argument
-    get_snippet_location = 'src.manager.linting.linting_manager.SnippetManager.get_snippet'
+    get_snippet_location = 'src.manager.linting.linting_manager.SnippetManager.get_snippet_headless'
 
     @mock.patch(get_snippet_location, return_value=None)
     def test_get_lint_output_no_snippet(self, mock1):
