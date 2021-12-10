@@ -1,106 +1,250 @@
-'''
-Test cases for Snippet CRUD Services
-'''
-from datetime import datetime
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import patch
+from src.manager.user_manager import UserManager
+from src.manager.snippet_manager import SnippetManager
+from src.model.user import User
 from botocore.stub import Stubber
 from werkzeug.datastructures import FileStorage
-from src.manager.snippet_manager import SnippetManager
-from src.manager.user_manager import UserManager
+from unittest.mock import MagicMock
 
 class TestSnippetView(unittest.TestCase):
     """
     Test class for Snippet related CRUD Services
     """
+
     def setUp(self):
-        self.snippet_manager = SnippetManager()
-        self.stub_table = Stubber(self.snippet_manager.table.meta.client)
-        self.stub_fs = Stubber(self.snippet_manager.fs)
-        self.user = UserManager()
-        self.user.stubber = Stubber(self.user.cognito_client)
-        self.stub_creds = Stubber(self.snippet_manager._creds)
+        pass
 
-    # Get flow
-    def test_get_snippet_success(self):
-        '''
-        Test fetching of the Snippet Metadata
-        '''
-        arg_id = 'user1-snippit-1'
-        self.stub_table.add_response(
+    @patch('src.manager.user_manager.UserManager.get_user_details')
+    def test_get_snippet_success_single(self, mock_user):
+        user = User()
+        user.email = 'abc@xyz.com'
+        user.name = 'ABC'
+        user.phone_number = '123'
+        mock_user.return_value = {
+            'data': {
+                'user': user
+            }
+        }
+        manager = SnippetManager()
+        dynamo_stub = Stubber(manager.table.meta.client)
+        dynamo_stub.add_response(
             'query',
-            {"Items": [{"id": {"S": "user1-snippit-1"}}]}
+            {"Items": [{"id": {"S": "user1-snippit-1"}, "author": {"S": "abc@xyz.com"}}]}
         )
-        self.stub_table.activate()
-        resp = self.snippet_manager.get_snippet(arg_id)
-        self.assertIsNotNone(resp.id)
+        dynamo_stub.activate()
+        resp = manager.get_snippet('user-snippit-1','asdasdasdasdasd')
+        self.assertEqual(len(resp[1]), 0)
+        self.assertEqual(len(resp[0]), 1)
 
-    def test_get_snippet_fail(self):
-        '''
-        Test fetching of the Snippet Metadata when the id does not exist
-        '''
-        arg_id = 'user1-snippit-1sdfsc'
-        self.stub_table.add_response(
+    @patch('src.manager.user_manager.UserManager.get_user_details')
+    def test_get_snippet_success_multiple(self, mock_user):
+        user = User()
+        user.email = 'abc@xyz.com'
+        user.name = 'ABC'
+        user.phone_number = '123'
+        mock_user.return_value = {
+            'data': {
+                'user': user
+            }
+        }
+        manager = SnippetManager()
+        dynamo_stub = Stubber(manager.table.meta.client)
+        dynamo_stub.add_response(
+            'scan',
+            {"Items": [{"id": {"S": "user1-snippit-1"}, "author": {"S": "abc@xyz.com"}}, {"id": {"S": "user1-snippit-2"}, "author": {"S": "abc@xyz.com"}}]}
+        )
+        dynamo_stub.activate()
+        resp = manager.get_snippet('','asdasdasdasdasd')
+        self.assertEqual(len(resp[1]), 0)
+        self.assertEqual(len(resp[0]), 2)
+        
+    @patch('src.manager.user_manager.UserManager.get_user_details')
+    def test_get_snippet_fail_single(self, mock_user):
+        user = User()
+        user.email = 'abc@xyz.com'
+        user.name = 'ABC'
+        user.phone_number = '123'
+        mock_user.return_value = {
+            'data': {
+                'user': user
+            }
+        }
+        manager = SnippetManager()
+        dynamo_stub = Stubber(manager.table.meta.client)
+        dynamo_stub.add_response(
             'query',
             {"Items": []}
         )
-        self.stub_table.activate()
-        resp = self.snippet_manager.get_snippet(arg_id)
-        self.assertIsNone(resp)
+        dynamo_stub.activate()
+        resp = manager.get_snippet('user-snippit-1','asdasdasdasdasd')
+        self.assertEqual(len(resp[1]), 1)
+        self.assertEqual(len(resp[0]), 0)
 
-    def test_create_snippet(self):
+    @patch('src.manager.user_manager.UserManager.get_user_details')
+    def test_get_snippet_fail_multiple(self, mock_user):
+        user = User()
+        user.email = 'abc@xyz.com'
+        user.name = 'ABC'
+        user.phone_number = '123'
+        mock_user.return_value = {
+            'data': {
+                'user': user
+            }
+        }
+        manager = SnippetManager()
+        dynamo_stub = Stubber(manager.table.meta.client)
+        dynamo_stub.add_response(
+            'scan',
+            {"Items": []}
+        )
+        dynamo_stub.activate()
+        resp = manager.get_snippet('',None)
+        self.assertEqual(len(resp[0]), 0)
+
+    @patch('src.manager.user_manager.UserManager.get_user_details')
+    def test_create_snippet_success(self, mock_user):
         '''
         Test creating of a new snippet
         '''
+        user = User()
+        user.email = 'abc@xyz.com'
+        user.name = 'ABC'
+        user.phone_number = '123'
+        mock_user.return_value = {
+            'data': {
+                'user': user
+            }
+        }
         data = open('./test/test_snippet/data.json', 'r')
         file = FileStorage(open('./test/test_snippet/binary_search_test.py', 'r'), 'abc.py')
-        self.stub_table.add_response(
-            'put_item',
-            {"Attributes": {"id": {"S": "user1-snippit-1"}}}
+        manager = SnippetManager()
+        dynamo_stub = Stubber(manager.table.meta.client)
+        dynamo_stub.add_response(
+            'query',
+            {"Items": [{"id": {"S": "user1-snippit-1"}, "author": {"S": "abc@xyz.com"}}]}
         )
-        self.stub_table.activate()
-        self.snippet_manager.user.cognito_client = MagicMock()
-        self.snippet_manager.fs.upload_fileobj = MagicMock()
-        self.snippet_manager.es.index = MagicMock()
-        snippet = self.snippet_manager.create_snippet(data, file)
+        dynamo_stub.activate()
+        manager.user.cognito_client = MagicMock()
+        manager.fs.upload_fileobj = MagicMock()
+        manager.es.index = MagicMock()
+        snippet, validation = manager.create_snippet(data, file, 'sdfsdfsdfsdf')
         self.assertIsNotNone(snippet)
 
-    def test_create_snippet_fail(self):
+
+    @patch('src.manager.user_manager.UserManager.get_user_details')
+    def test_create_snippet_fail(self, mock_user):
         '''
-        Test creating of a new snippet in the event of fail
+        Test creating of a new snippet
         '''
+        user = User()
+        user.email = 'abc@xyz.com'
+        user.name = 'ABC'
+        user.phone_number = '123'
+        mock_user.return_value = {
+            'data': {
+                'user': user
+            }
+        }
+        data = open('./test/test_snippet/data_error.json', 'r')
+        file = FileStorage(open('./test/test_snippet/binary_search_test.py', 'r'), 'abc.py')
+        manager = SnippetManager()
+        dynamo_stub = Stubber(manager.table.meta.client)
+        dynamo_stub.add_response(
+            'query',
+            {"Items": [{"id": {"S": "user1-snippit-1"}, "author": {"S": "abc@xyz.com"}}]}
+        )
+        dynamo_stub.activate()
+        manager.user.cognito_client = MagicMock()
+        manager.fs.upload_fileobj = MagicMock()
+        manager.es.index = MagicMock()
+        snippet, validation = manager.create_snippet(data, file, 'sdfsdfsdfsdf')
+        self.assertIsNotNone(snippet)
+        self.assertEqual(len(validation), 1)
+
+    @patch('src.manager.user_manager.UserManager.get_user_details')
+    def test_update_snippet_success(self, mock_user):
+        '''
+        Test creating of a new snippet
+        '''
+        user = User()
+        user.email = 'abc@xyz.com'
+        user.name = 'ABC'
+        user.phone_number = '123'
+        mock_user.return_value = {
+            'data': {
+                'user': user
+            }
+        }
         data = open('./test/test_snippet/data.json', 'r')
         file = FileStorage(open('./test/test_snippet/binary_search_test.py', 'r'), 'abc.py')
-        self.stub_table.add_client_error('put_item', 'ConnectionRefused')
-        self.stub_table.activate()
-        self.snippet_manager.user.cognito_client = MagicMock()
-        self.snippet_manager.fs.upload_fileobj = MagicMock()
-        self.snippet_manager.es.index = MagicMock()
-        failed = False
-        try :
-            snippet = self.snippet_manager.create_snippet(data, file)
-        except Exception as e:
-            failed = True
-        self.assertTrue(failed)
+        manager = SnippetManager()
+        dynamo_stub = Stubber(manager.table.meta.client)
+        dynamo_stub.add_response(
+            'query',
+            {"Items": [{"id": {"S": "user1-snippit-1"}, "author": {"S": "abc@xyz.com"}}]}
+        )
+        dynamo_stub.activate()
+        manager.user.cognito_client = MagicMock()
+        manager.fs.upload_fileobj = MagicMock()
+        manager.es.index = MagicMock()
+        snippet, validation = manager.update_snippet(data, file, 'sdfsdfsdfsdf')
+        self.assertIsNotNone(snippet)
 
-    def test_update_snippet_fail(self):
+    @patch('src.manager.user_manager.UserManager.get_user_details')
+    def test_create_snippet_fail(self, mock_user):
         '''
-        Test creating of a new snippet in the event of fail
+        Test creating of a new snippet
         '''
-        data = open('./test/test_snippet/data.json', 'r')
+        user = User()
+        user.email = 'abc@xyz.com'
+        user.name = 'ABC'
+        user.phone_number = '123'
+        mock_user.return_value = {
+            'data': {
+                'user': user
+            }
+        }
+        data = open('./test/test_snippet/data_error.json', 'r')
         file = FileStorage(open('./test/test_snippet/binary_search_test.py', 'r'), 'abc.py')
-        self.stub_table.add_client_error('put_item', 'ConnectionRefused')
-        self.stub_table.activate()
-        self.snippet_manager.user.cognito_client = MagicMock()
-        self.snippet_manager.fs.upload_fileobj = MagicMock()
-        self.snippet_manager.es.index = MagicMock()
-        failed = False
-        try :
-            snippet = self.snippet_manager.update_snippet(data, file)
-        except Exception as e:
-            failed = True
-        self.assertTrue(failed)
+        manager = SnippetManager()
+        dynamo_stub = Stubber(manager.table.meta.client)
+        dynamo_stub.add_response(
+            'query',
+            {"Items": [{"id": {"S": "user1-snippit-1"}, "author": {"S": "abc@xyz.com"}}]}
+        )
+        dynamo_stub.activate()
+        manager.user.cognito_client = MagicMock()
+        manager.fs.upload_fileobj = MagicMock()
+        manager.es.index = MagicMock()
+        snippet, validation = manager.update_snippet(data, file, 'sdfsdfsdfsdf')
+        self.assertIsNotNone(snippet)
+        self.assertEqual(len(validation), 1)
 
-
-if __name__=="__main__":
-    unittest.main()
+    @patch('src.manager.user_manager.UserManager.get_user_details')
+    def test_delete_snippet_fail(self, mock_user):
+        '''
+        Test creating of a new snippet
+        '''
+        user = User()
+        user.email = 'abc@xyz.com'
+        user.name = 'ABC'
+        user.phone_number = '123'
+        mock_user.return_value = {
+            'data': {
+                'user': user
+            }
+        }
+        manager = SnippetManager()
+        dynamo_stub = Stubber(manager.table.meta.client)
+        dynamo_stub.add_response(
+            'query',
+            {"Items": [{"id": {"S": "user1-snippit-1"}, "author": {"S": "abc@xyz.com"}}]}
+        )
+        dynamo_stub.activate()
+        manager.user.cognito_client = MagicMock()
+        manager.fs.upload_fileobj = MagicMock()
+        manager.es.index = MagicMock()
+        snippet, validation = manager.delete_snippet('user1-snippit-1', 'sdfsdfsdfsdf')
+        self.assertIsNotNone(snippet)
+        self.assertEqual(len(validation), 1)
