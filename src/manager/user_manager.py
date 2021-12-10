@@ -64,8 +64,6 @@ class UserManager():
         except self.cognito_client.exceptions.InvalidPasswordException:
             return MessageFormat().error_message("Password should have Caps, \
                 Special chars, Numbers")
-        except self.cognito_client.exceptions.UserLambdaValidationException:
-            return MessageFormat().error_message("Email already exists")
         except Exception as err:
             return MessageFormat().error_message(str(err))
 
