@@ -450,9 +450,9 @@ class SnippetManager():
             snippet = Snippet.to_snippet(self.table.query(
                 KeyConditionExpression = Key('id').eq(snippet_id)
             )['Items'][0])
-            logging.info(f'Snippet Obtained : {snippet}')
+            logging.info('Snippet Obtained : {%s}', snippet)
         except Exception as key_error:
-            logging.error(f'Key: {snippet_id} does not exist in the database. Full Error : {key_error}')
+            logging.error('Key: {%s} does not exist in the database. Full Error : {%s}', snippet_id, key_error)
             snippet = None
         return snippet
 

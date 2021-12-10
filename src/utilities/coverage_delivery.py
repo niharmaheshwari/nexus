@@ -1,12 +1,11 @@
 '''
 Helper routine for writing the coverage to S3
 '''
-import src.utilities.logging as log
-import boto3
 import os
+import boto3
+import src.utilities.logging as log
 
-logging = log.get_logger(__name__)
-logging.setLevel(logging.DEBUG)
+logger = log.get_logger(__name__)
 
 session = boto3.Session(
     aws_access_key_id=os.environ['ACCESS_KEY'],
@@ -21,4 +20,3 @@ for root, dirs, files in os.walk('test/coverage', topdown=False):
             'snippets-s',
             root + '/' + name
         )
-

@@ -2,8 +2,6 @@
 User authorization decorator
 """
 
-
-import logging
 from flask import request
 from jose import jwk, jwt
 from src.utilities.authentication_utils import get_keys, find_public_key, is_audience_valid, \
@@ -12,7 +10,6 @@ from src.model.message_format import MessageFormat
 import src.utilities.logging as log
 
 logger = log.get_logger(__name__)
-
 
 def authorization(func):
     """
