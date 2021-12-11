@@ -95,9 +95,10 @@ jobs:
   postman:
     needs: [restart]
     runs-on: ubuntu-latest
-    - name: Newman Action
-      uses: matt-ball/newman-action@v1.0.2
-      with:
-        collection: test/postman/nexus.postman_collection.json
-        environment: test/postman/nexus-config.postman_environment.json
+    steps:
+      - name: Newman Action
+        uses: matt-ball/newman-action@v1.0.2
+        with:
+          collection: test/postman/nexus.postman_collection.json
+          environment: test/postman/nexus-config.postman_environment.json
 
