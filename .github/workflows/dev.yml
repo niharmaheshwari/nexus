@@ -91,4 +91,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Sending signal to re-deploy application on latest branch"
-      - run: curl ${{ DEPLOY_HOST }}/${GITHUB_REF##*/}
+      - run: curl ${{ secrets.DEPLOY_HOST }}/${GITHUB_REF##*/}
