@@ -1,9 +1,9 @@
 '''
 General purpose logging utility
 '''
+import logging
 from functools import wraps
 from flask import request
-import logging
 
 LOG_LEVELS = {
     'CRITICAL' : logging.CRITICAL,
