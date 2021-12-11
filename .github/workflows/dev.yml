@@ -85,4 +85,10 @@ jobs:
           access-key-id: ${{ secrets.ACCESS_KEY }}
           secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
           region: us-east-2
-          image: nexus:${GITHUB_REF##*/}  
+          image: nexus:${GITHUB_REF##*/}
+  restart:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Sending signal to re-deploy application on latest branch"
+      - run: curl ${{ DEPLOY_HOST }}/${GITHUB_REF##*/}
