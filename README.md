@@ -45,6 +45,9 @@ coverage html --omit="**/Library/*,*__init__.py" -d test/coverage
 ```
 The above command generates a report in the `test` forlder.
 
+**Sonar Test Link**
+https://sonarcloud.io/dashboard?id=niharmaheshwari_nexus&branch=main&resolved=false
+
 #### 5. Build and Run the service
 **Steps for building and running the nexus service**
 1. ssh to the ec2 server "3.135.193.250"
@@ -64,7 +67,36 @@ tmux
 ./deploy.sh
 ```
 
-#### 6. API Documentation
+#### 6. Building the Client UI
+## Available Scripts
+
+In the project directory, you can run:
+
+### `npm start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+
+#### 7. API Documentation
 # Project: Nexus
 ### NEXUS API Collection
 This document enlists all the APIs with their parameters for Nexus.

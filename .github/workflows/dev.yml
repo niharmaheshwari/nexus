@@ -9,6 +9,7 @@ on:
       - 'tykosc-search'
       - 'authorization-tests-slj2142'
       - '36-crud-tests-nm3223'
+      - 'main'
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -102,5 +103,4 @@ jobs:
         with:
           collection: test/postman/nexus.postman_collection.json
           environment: test/postman/nexus-config.postman_environment.json
-          reporters: '["emojitrain"]'
           delayRequest: 5000
