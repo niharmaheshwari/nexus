@@ -76,7 +76,7 @@ jobs:
       - name: Assemble and Deploy
         run: |
           echo "Starting a docker build on ${{ github.ref }} for ${{ github.repository }}"
-          docker build -t nexus:${GITHUB_REF##*/} .
+          docker build --build-arg host=${{ secrets.HOST }} -t nexus:${GITHUB_REF##*/} .
           echo "Build successful. Publishing to ECR"
       - name: Push to ECR
         id: ecr

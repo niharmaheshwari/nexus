@@ -8,6 +8,9 @@
 # Stage [0] : Alpine Checkout
 FROM alpine:3
 
+ARG host
+ENV HOST=$host
+
 ##################### INSTALL DEPENDENCIES #################################
 
 # Keeps Python from generating .pyc files in the container
@@ -42,6 +45,7 @@ COPY . /nexus
 
 # Start the UI build
 WORKDIR /nexus/src/client
+RUN echo "REACT_APP_SERVER=\"${HOST}/api\"" > .env
 RUN npm run deploy
 
 # Start the Python Assembly
