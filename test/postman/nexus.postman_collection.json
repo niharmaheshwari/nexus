@@ -114,7 +114,7 @@
 						{
 							"key": "file",
 							"type": "file",
-							"src": "test/postman/tfidf.py"
+							"src": "/Users/nmw/tmp/tfidf.py"
 						},
 						{
 							"key": "data",
@@ -305,8 +305,26 @@
 			"name": "lint",
 			"request": {
 				"method": "GET",
-				"header": [],
-				"url": null
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{host}}:{{api-port}}/api/lint/{{test_snippet}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{api-port}}",
+					"path": [
+						"api",
+						"lint",
+						"{{test_snippet}}"
+					]
+				}
 			},
 			"response": []
 		}

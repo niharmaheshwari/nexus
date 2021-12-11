@@ -102,4 +102,5 @@ jobs:
         with:
           collection: test/postman/nexus.postman_collection.json
           environment: test/postman/nexus-config.postman_environment.json
-
+          reporters: '["emojitrain", "cli"]'
+          delayRequest: 5000
