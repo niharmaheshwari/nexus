@@ -105,7 +105,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -152,6 +151,5 @@ cython_debug/
 # **/__init__.py
 
 # misc
-src/constants/secrets.py
 
 .idea

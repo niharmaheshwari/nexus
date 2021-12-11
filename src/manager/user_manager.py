@@ -2,15 +2,15 @@
 User manager class
 """
 
-import logging
 import boto3
+from jose import jwt
 from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY, \
             REGION, USER_POOL_ID, CLIENT_ID
 from src.utilities.authentication_utils import get_hashcode, deserialize_user_object
 from src.model.message_format import MessageFormat
+import src.utilities.logging as log
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger = log.get_logger(__name__)
 
 # pylint: disable=broad-except
 class UserManager():
@@ -37,6 +37,7 @@ class UserManager():
             :dict, with email confirmation message
         """
         # check whether all values are present
+        logger.info("signing up using cognito...")
         for attribute in ["email", "password", "name", "birthdate", "phone_number"]:
             if not user_details.get(attribute):
                 return MessageFormat().error_message(f"{attribute} is not present")
@@ -63,8 +64,6 @@ class UserManager():
         except self.cognito_client.exceptions.InvalidPasswordException:
             return MessageFormat().error_message("Password should have Caps, \
                 Special chars, Numbers")
-        except self.cognito_client.exceptions.UserLambdaValidationException:
-            return MessageFormat().error_message("Email already exists")
         except Exception as err:
             return MessageFormat().error_message(str(err))
 
@@ -80,6 +79,7 @@ class UserManager():
         :returns:
             None
         """
+        logger.info("verifying the otp...")
         if email is None or otp is None:
             return MessageFormat().error_message("Email/OTP is a required attribute.")
         try:
@@ -109,6 +109,7 @@ class UserManager():
         :returns:
             dictionary, with unique session details
         """
+        logger.info("initiating authentication sequence...")
         secret_hash = get_hashcode(username)
         try:
             response = self.cognito_client.admin_initiate_auth(
@@ -142,6 +143,7 @@ class UserManager():
         :returns:
             dictionary, session details
         """
+        logger.info("login the user...")
         # check whether credentials are present
         for attribute in ["email", "password"]:
             if not user_credentials.get(attribute):
@@ -170,6 +172,7 @@ class UserManager():
         :returns:
             dictionary, new id token and access token for the user
         """
+        logger.info("generating new id and access token...")
         for attribute in ["email", "refresh_token"]:
             if not refresh_token_details.get(attribute):
                 return MessageFormat().error_message(f"{attribute} is not present")
@@ -201,17 +204,20 @@ class UserManager():
         except Exception as err:
             return MessageFormat().error_message(str(err))
 
-    def get_user_details(self, email):
+    def get_user_details(self, token):
         """
         Fetches all cognito stored attributes
         for the user
         :params:
-            email: str, unique email address for the user
+            token: str, session id for the user
         :returns:
             dictionary, with user object
         """
-        if email is None:
-            return MessageFormat().error_message("Email is required.")
+        logger.info("fetching user details...")
+        # the user is verified at this point
+        # get the payload
+        claims = jwt.get_unverified_claims(token)
+        email = claims['email']
         try:
             response = self.cognito_client.admin_get_user(
                 UserPoolId=USER_POOL_ID,

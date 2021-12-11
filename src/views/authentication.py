@@ -1,20 +1,19 @@
 """
 Views for authentication APIs
 """
-import logging
 from flask import request, jsonify, Blueprint
 from src.manager.user_manager import UserManager
 from src.model.message_format import MessageFormat
 from src.utilities.authentication_utils import serialize_user_object
 from src.utilities.authorization import authorization
+from src.utilities.logging import logger
 
-log = logging.getLogger(__name__)
-log.setLevel(logging.ERROR)
 MANAGER = UserManager()
 
-auth = Blueprint('auth', __name__, url_prefix='/auth')
+auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 @auth.route('/', methods=['GET'])
+@logger
 def init():
     """
     Initialization API call
@@ -22,6 +21,7 @@ def init():
     return jsonify("Hello World")
 
 @auth.route('/signup', methods=["POST"])
+@logger
 def user_signup():
     """
     Allows user to signup and register
@@ -30,6 +30,7 @@ def user_signup():
     return jsonify(MANAGER.signup(request_body))
 
 @auth.route('/confirm-signup', methods=["POST"])
+@logger
 def user_confirm_signup():
     """
     Confirms user signup with the verification code
@@ -40,6 +41,7 @@ def user_confirm_signup():
     return jsonify(MANAGER.confirm_signup(email, code))
 
 @auth.route('/login', methods=["POST"])
+@logger
 def user_login():
     """
     Logs in the user and returns session details
@@ -55,15 +57,15 @@ def refresh_token():
     request_body = request.get_json()
     return jsonify(MANAGER.generate_new_token(request_body))
 
-@auth.route('/get-user', methods=["POST"])
+@auth.route('/get-user', methods=["GET"])
+@logger
 @authorization
 def get_user_details():
     """
     Fetches user attributes
     """
-    request_body = request.get_json()
-    email = request_body.get("email", None)
-    response = MANAGER.get_user_details(email)
+    id_token = request.headers.get("token", None)
+    response = MANAGER.get_user_details(id_token)
     if response["data"] is not None:
         user_details = serialize_user_object(response["data"]["user"])
         return jsonify(MessageFormat().success_message(\
