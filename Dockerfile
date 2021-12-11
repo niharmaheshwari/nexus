@@ -13,6 +13,8 @@ ENV HOST=$host
 
 ##################### INSTALL DEPENDENCIES #################################
 
+RUN apk update && apk add bash
+
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
 
