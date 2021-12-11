@@ -9,6 +9,7 @@ from src.utilities.authorization import authorization
 snippet_blueprint = Blueprint('snippet', __name__, url_prefix='/api/snippet')
 mgr = SnippetManager()
 
+INTERNAL_SERVER_ERROR = 'Internal Server Error!'
 
 def fetch_snippet(inflight_request):
     '''
@@ -30,7 +31,7 @@ def fetch_snippet(inflight_request):
             return MessageFormat().success_message(data=snippets[0].to_dict())
         else:
             return MessageFormat().success_message(data=list(map(lambda x: x.to_dict(), snippets)))
-    return MessageFormat().error_message('Internal Server Error!', 500)
+    return MessageFormat().error_message(INTERNAL_SERVER_ERROR, 500)
 
 def create_snippet(inflight_request):
     '''
@@ -52,7 +53,7 @@ def create_snippet(inflight_request):
     if snippet is not None:
         logging.error('Snippet : %s', str(snippet))
         return MessageFormat().success_message(data=snippet.to_dict())
-    return MessageFormat().error_message('Internal Server Error!', 500)
+    return MessageFormat().error_message(INTERNAL_SERVER_ERROR, 500)
 
 def update_snippet(inflight_request):
     '''
@@ -72,7 +73,7 @@ def update_snippet(inflight_request):
         return MessageFormat().error_message(validation, 400)
     if snippet is not None:
         return MessageFormat().success_message(data = snippet.to_dict())
-    return MessageFormat().error_message('Internal Server Error!', 500)
+    return MessageFormat().error_message(INTERNAL_SERVER_ERROR, 500)
 
 def remove_snippet(inflight_request):
     '''
@@ -93,7 +94,7 @@ def remove_snippet(inflight_request):
     if result is not None:
         # If everything is fine, return the dict view of the Snippet for the last time
         return MessageFormat().success_message(data=result.to_dict())
-    return MessageFormat.error_message('Internal Server Error!', 500)
+    return MessageFormat.error_message(INTERNAL_SERVER_ERROR, 500)
 
 @snippet_blueprint.route('', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @authorization

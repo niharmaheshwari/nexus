@@ -114,7 +114,7 @@
 						{
 							"key": "file",
 							"type": "file",
-							"src": "/Users/nmw/tmp/tfidf.py"
+							"src": "test/postman/tfidf.py"
 						},
 						{
 							"key": "data",
