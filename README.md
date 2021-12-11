@@ -47,7 +47,11 @@ https://sonarcloud.io/dashboard?id=niharmaheshwari_nexus&branch=main&resolved=fa
 #### 5. Reports
 
 **SONAR REPORT** : https://sonarcloud.io/dashboard?id=niharmaheshwari_nexus&branch=main&resolved=false
+
 **COVERAGE**     : /test/coverage/index.html
+
+**CI REPORT**    : https://github.com/niharmaheshwari/nexus/actions
+
 
 #### 6. Client Driver UI
 
