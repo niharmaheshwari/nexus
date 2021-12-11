@@ -45,7 +45,7 @@ COPY . /nexus
 
 # Start the UI build
 WORKDIR /nexus/src/client
-RUN echo "REACT_APP_SERVER=\"${HOST}/api\"" > .env
+RUN echo "REACT_APP_SERVER=\"http://${HOST}/api\"" > .env
 RUN npm run deploy
 
 # Start the Python Assembly
