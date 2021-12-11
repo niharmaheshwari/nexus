@@ -304,7 +304,7 @@ class TestSnippetView(unittest.TestCase):
         snippet, validation = manager.create_snippet(data.read(), file, 'sdfsdfsdfsdf')
         self.assertIsNotNone(snippet)
         self.assertEqual(len(validation), 2)
-        self.assertEqual(validation[0], 'There was an error fetching user information')
+        self.assertEqual(validation[0], 'CREATE : FAIL : FETCH USER INFO')
 
     @patch('src.manager.user_manager.UserManager.get_user_details')
     @patch('uuid.uuid1')
@@ -489,4 +489,4 @@ class TestSnippetView(unittest.TestCase):
         manager.es.index = MagicMock()
         snippet, validation = manager.delete_snippet('user1-snippit-1', 'sdfsdfsdfsdf')
         self.assertEqual(len(validation), 1)
-        self.assertEqual(validation[0], 'This snippet does not exist or is corrupt to delete')
+        self.assertEqual(validation[0], 'DELETE : FAIL : USER FETCH')
