@@ -1,11 +1,4 @@
 # nexus
-
-## Contents
-1. [About](#1-about)
-2. [Team](#2-team)
-4. [Issues](#3-issues)
-5. [Setup](#4-setup)
-
 ___
 
 #### 1. About
@@ -29,6 +22,7 @@ Check [this](https://github.com/niharmaheshwari/nexus/issues) for active develop
 
 #### 4. Tests
 **Steps for running unit tests and coverage**
+
 For running individual tests:
 ```
 python3 -m unittest -v <test-module-path>
@@ -46,57 +40,27 @@ coverage html --omit="**/Library/*,*__init__.py" -d test/coverage
 The above command generates a report in the `test` forlder.
 
 **Sonar Test Link**
+
 https://sonarcloud.io/dashboard?id=niharmaheshwari_nexus&branch=main&resolved=false
 
-#### 5. Build and Run the service
-**Steps for building and running the nexus service**
-1. ssh to the ec2 server "3.135.193.250"
-2. Login to the user nexus using the password 'nexus' without quotes
+
+#### 5. Reports
+
+**SONAR REPORT** : https://sonarcloud.io/dashboard?id=niharmaheshwari_nexus&branch=main&resolved=false
+**COVERAGE**     : /test/coverage/index.html
+
+#### 6. Client Driver UI
+
+** LINK ** : http://3.135.226.45:5000/
+
+#### 7. Build and Run the service and UI
 ```
-sudo su nexus
-```
-3. Switch to home directory
-```
-cd ~
-```
-4. Run the following commands, when prompted for ssh password enter "nexus123" without quotes
-```
-source env/bin/activate
-tmux kill-server
-tmux
-./deploy.sh
+aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 396162446973.dkr.ecr.us-east-2.amazonaws.com
+docker pull 396162446973.dkr.ecr.us-east-2.amazonaws.com/nexus:$1
+docker run -d -p 5000:5000 --env-file ./environ.env 396162446973.dkr.ecr.us-east-2.amazonaws.com/nexus:$1
 ```
 
-#### 6. Building the Client UI
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-
-#### 7. API Documentation
+#### 8. API Documentation
 # Project: Nexus
 ### NEXUS API Collection
 This document enlists all the APIs with their parameters for Nexus.
@@ -116,7 +80,7 @@ Allows the user to create an account with user details. Sends otp confirmation o
 Email should be unique.
 ### Method: POST
 >```
->{{hostname}}:{{port}}/auth/signup
+>{{hostname}}:{{port}}/api/auth/signup
 >```
 ### Body (**raw**)
 
@@ -142,7 +106,7 @@ Verifies otp sent to the user's email address. It is valid for 24 hours.
 - code: str, otp code (6 digits)
 ### Method: POST
 >```
->{{hostname}}:{{port}}/auth/confirm-signup
+>{{hostname}}:{{port}}/api/auth/confirm-signup
 >```
 ### Body (**raw**)
 
@@ -165,7 +129,7 @@ Allows the user to login using email and password.
 * password: str, user password
 ### Method: POST
 >```
->{{hostname}}:{{port}}/auth/login
+>{{hostname}}:{{port}}/api/auth/login
 >```
 ### Body (**raw**)
 
@@ -184,28 +148,19 @@ Allows the user to login using email and password.
 Fetches the user details and returns a json. This is a protected API. User needs to have authorization id-token to call this API.
 
 #### Params:
-- email: str, email address of the user
+- None
 
 #### Header:
 - token: str, unique id_token for the user session.
-### Method: POST
+### Method: GET
 >```
->{{hostname}}:{{port}}/auth/get-user
+>{{hostname}}:{{port}}/api/auth/get-user
 >```
 ### Headers
 
 |Content-Type|Value|
 |---|---|
 |token|{{token}}|
-
-
-### Body (**raw**)
-
-```json
-{
-    "email": "nm3223@columbia.edu"
-}
-```
 
 
 ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
@@ -215,7 +170,7 @@ Fetches the user details and returns a json. This is a protected API. User needs
 Sample GET API.
 ### Method: GET
 >```
->{{hostname}}:{{port}}/auth/
+>{{hostname}}:{{port}}/api/auth/
 >```
 
 ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
@@ -234,7 +189,7 @@ Sample GET API.
 - file : A {.cpp | .py | .java} file having the actual code snippet.
 ### Method: POST
 >```
->{{hostname}}:{{port}}/snippet
+>{{hostname}}:{{port}}/api/snippet
 >```
 ### Headers
 
@@ -264,7 +219,7 @@ Sample GET API.
 - id : The ID of the snippet.
 ### Method: GET
 >```
->{{hostname}}:{{port}}/snippet?id=f7e001ea-4689-11ec-a171-13e5113b32d1
+>{{hostname}}:{{port}}/api/snippet?id=f7e001ea-4689-11ec-a171-13e5113b32d1
 >```
 ### Headers
 
@@ -297,7 +252,7 @@ Sample GET API.
 - file : A {.cpp | .py | .java} file having the actual code snippet.
 ### Method: PUT
 >```
->{{hostname}}:{{port}}/snippet
+>{{hostname}}:{{port}}/api/snippet
 >```
 ### Headers
 
@@ -325,7 +280,7 @@ Sample GET API.
 - id: The identifier of the snippet.
 ### Method: DELETE
 >```
->{{hostname}}:{{port}}/snippet?id=8e0092ba-4640-11ec-81b9-1e003b213c26
+>{{hostname}}:{{port}}/api/snippet?id=8e0092ba-4640-11ec-81b9-1e003b213c26
 >```
 ### Headers
 
@@ -352,7 +307,7 @@ This is a utility method to check if the server is live. The path parameter for 
 None
 ### Method: GET
 >```
->{{hostname}}:{{port}}/test/ping
+>{{hostname}}:{{port}}/api/test/ping
 >```
 
 ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
@@ -365,7 +320,7 @@ This is a utility endpoint to check if the server is active. If active, the serv
 None
 ### Method: GET
 >```
->{{hostname}}:{{port}}/test
+>{{hostname}}:{{port}}/api/test
 >```
 
 ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
@@ -380,7 +335,7 @@ and dynamodb
 - None
 ### Method: GET
 >```
->{{hostname}}:{{port}}/dummy
+>{{hostname}}:{{port}}/api/dummy
 >```
 
 ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
@@ -394,7 +349,7 @@ Allows the user to search for snippets efficiently. Full text matching will be a
 - email: str, email address of the user
 ### Method: POST
 >```
->{{hostname}}:{{port}}/search
+>{{hostname}}:{{port}}/api/search
 >```
 ### Headers
 
@@ -412,6 +367,32 @@ Allows the user to search for snippets efficiently. Full text matching will be a
 }
 ```
 
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## End-point: GET Lint a Snippet
+### GET Lint Snippet
+- This request fetches a snippet given its snippet ID and lints it depending on the language
+- A valid fetch results in a 200 OK with the linting response. 
+- An invalid fetch (the case where the id does not exist) results in a 404 (NOT_FOUND)
+
+#### Params:
+- id : The ID of the snippet (this is a path parameter).
+### Method: GET
+>```
+>{{hostname}}:{{port}}/api/lint/f7e001ea-4689-11ec-a171-13e5113b32d1
+>```
+### Headers
+
+|Content-Type|Value|
+|---|---|
+|token|{{token}}|
+
+
+### Path Params
+
+|Param|value|
+|---|---|
+|id|f7e001ea-4689-11ec-a171-13e5113b32d1|
 
 ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
 _________________________________________________
