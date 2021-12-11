@@ -92,3 +92,12 @@ jobs:
     steps:
       - run: echo "Sending signal to re-deploy application on latest branch"
       - run: curl ${{ secrets.DEPLOY_HOST }}/${GITHUB_REF##*/}
+  postman:
+    needs: [restart]
+    runs-on: ubuntu-latest
+    - name: Newman Action
+      uses: matt-ball/newman-action@v1.0.2
+      with:
+        collection: test/postman/nexus.postman_collection.json
+        environment: test/postman/nexus-config.postman_environment.json
+

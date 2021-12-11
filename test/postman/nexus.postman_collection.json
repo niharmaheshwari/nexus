@@ -1,0 +1,314 @@
+{
+	"info": {
+		"_postman_id": "f9c413d4-dd50-40c3-8974-175992a5d88f",
+		"name": "nexus",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var response_body = JSON.parse(responseBody);",
+							"pm.globals.set(\"token\", response_body.data.id_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{username}}\",\n    \"password\": \"{{passkey}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{host}}:{{api-port}}/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{api-port}}",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "### Prerequisites\n\nThis endpoint assumes that a user is already created and the credentials of the user are present in the collection environment configuration.\n\nThe email is expected to be present under the `username` variable and the password is expected under the `passkey` variable.\n\n### Returns\n\nThis end point returns the following:\n\n*   `access_token` : The access token of the user.\n*   `expires_in`: Time to live for the token.\n*   `id_token`: Master token forwarded in subsequent authentication calls.\n*   `refresh_token`: Refresh token for the user\n*   `token_type`: Bearer by default\n    \n\n### Notes\n\nThe `id_token` is set in the globals and forwarded on subsequent calls."
+			},
+			"response": []
+		},
+		{
+			"name": "user",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{host}}:{{api-port}}/api/auth/get-user",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{api-port}}",
+					"path": [
+						"api",
+						"auth",
+						"get-user"
+					]
+				},
+				"description": "### Prerequisites\n\nAssumes that the token has been obtained in the previous calls and is present in an environment variable called `token`\n\n### Response\n\nFetches the details of the user by getting user details from the session `token`"
+			},
+			"response": []
+		},
+		{
+			"name": "snippet",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var response_body = JSON.parse(responseBody);",
+							"pm.globals.set(\"snippet_id\", response_body.data.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "test/postman/tfidf.py"
+						},
+						{
+							"key": "data",
+							"value": "{\n    \"email\": \"nm3223@columbia.edu\",\n    \"id\": \"dfsjdf\",\n    \"desc\": \"A generic binary search for sorted datasets\",\n    \"tags\": [\"binary_search\", \"algorithms\", \"prep\"],\n    \"shares\": [\"user@gmail.com\"]\n}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{host}}:{{api-port}}/api/snippet",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{api-port}}",
+					"path": [
+						"api",
+						"snippet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "snippet",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{host}}:{{api-port}}/api/snippet?id={{snippet_id}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{api-port}}",
+					"path": [
+						"api",
+						"snippet"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{snippet_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "snippet",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"snippet_id = pm.globals.get(\"snippet_id\");",
+							"data = {",
+							"    \"id\": snippet_id,",
+							"    \"desc\": \"updated desc\"",
+							"}",
+							"pm.globals.set(\"updated_snippet\", JSON.stringify(data));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "data",
+							"value": "{{updated_snippet}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{host}}:{{api-port}}/api/snippet",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{api-port}}",
+					"path": [
+						"api",
+						"snippet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "snippet",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{host}}:{{api-port}}/api/snippet?id={{snippet_id}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{api-port}}",
+					"path": [
+						"api",
+						"snippet"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{snippet_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.globals.set(\"test_snippet\", \"de8d4c14-5abc-11ec-b9e5-0242ac110002\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"search_string\": \"binary\",\n    \"email\": \"{{username}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{host}}:{{api-port}}/api/search",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{api-port}}",
+					"path": [
+						"api",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "lint",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": []
+		}
+	]
+}
