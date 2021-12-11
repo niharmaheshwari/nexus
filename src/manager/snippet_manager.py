@@ -375,8 +375,6 @@ class SnippetManager():
             logging.error('Full Error: %s', elastic_fail)
             logging.warn('There are inconsitencies between S3 / Dynamo / Elastic. Please check')
 
-        except Exception as e:
-            logging.error('There was an exception during upload.')
         return snippet, validation
 
     def delete_snippet(self, id, token):
