@@ -49,7 +49,7 @@ jobs:
           pip install -r requirements.txt
           python -m unittest discover
           coverage run -m unittest discover
-          coverage html --omit="**/Library/*,*__init__.py" -d test/coverage
+          coverage html --omit="**/Library/*,*__init__.py,home/*,usr/*" -d test/coverage
           echo "Publishing Results to S3"
           python -m src.utilities.coverage_delivery
   sonarcloud:
