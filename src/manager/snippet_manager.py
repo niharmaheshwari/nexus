@@ -21,6 +21,8 @@ from src.constants.constants import AWS_REGION, SNIPPET_TABLE
 from src.constants.secrets import ACCESS_KEY, SECRET_ACCESS_KEY
 
 logging = log.get_logger(__name__)
+ERROR = 'Full Error: %s'
+S3_ERROR = 'Exception while setting the S3 URI'
 
 LANG_EXTENTION = {
     'py': 'Python',
@@ -119,15 +121,15 @@ class SnippetManager():
                 logging.info('Table Result : %s', str(table_res))
                 for res in table_res:
                     snippet = Snippet.to_snippet(res)
-                    if snippet.author == user_details['data']['user'].email:
+                    if (
+                        snippet.author == user_details['data']['user'].email or 
+                            (
+                                snippet.shares is not None and
+                                len(snippet.shares) > 0 and
+                                user_details['data']['user'].email in snippet.shares
+                            )
+                        ):
                         result.append(snippet)
-                    elif (
-                        snippet.shares is not None and
-                        len(snippet.shares) > 0 and
-                        user_details['data']['user'].email in snippet.shares
-                    ):
-                        result.append(snippet)
-
             except Exception as query_error:
                 logging.error('There was an error while fetching multiple snippets from the DB')
                 logging.error('Error: %s', query_error)
@@ -167,11 +169,11 @@ class SnippetManager():
 
         try:
             user_details = self.user.get_user_details(token)
-            logging.info('User is : %s', user_details )
+            logging.info('User in the create snippet call is : %s', user_details )
             snippet.author = user_details['data']['user'].email
         except Exception as user_fail:
-            logging.error('There was an error while getting the user details. Error: %s', user_fail)
-            validation.append('There was an error fetching user information')
+            logging.error('CREATE : There was an error getting the user.Error: %s', user_fail)
+            validation.append('CREATE : FAIL : FETCH USER INFO')
 
         try:
             snippet.lang = LANG_EXTENTION[file_data.filename.split('.')[-1]]
@@ -212,14 +214,14 @@ class SnippetManager():
             snippet.uri = const.S3 + snippet.id
         except Exception as uri_fail:
             logging.error('Exception occured while setting the file name and location on S3')
-            logging.error('Full Error: %s', uri_fail)
-            validation.append('Exception while setting the S3 URI')
+            logging.error(ERROR, uri_fail)
+            validation.append(S3_ERROR)
 
         try:
             logging.info('Adding snippet to the S3 location')
             # Storing files with the id of the snippet in S3. This is to prevent write clashes for
             # multiple files with the same name.
-            f = self._fs.upload_fileobj(file_data,const.BUCKET,snippet.id, ExtraArgs = {
+            self._fs.upload_fileobj(file_data,const.BUCKET,snippet.id, ExtraArgs = {
                 'ContentType': 'text/plain'
             })
         except Exception as upload_fail:
@@ -249,7 +251,7 @@ class SnippetManager():
             )
         except Exception as elastic_fail:
             logging.error('There was an exception while adding the snippet to elastic')
-            logging.error('Full Error: %s', elastic_fail)
+            logging.error(ERROR, elastic_fail)
             logging.error('Performing an emergency rollback on DynamoDB')
             self.table.delete_item(Key={'id': snippet.id})
             validation.append('Failed to add Snippet to Elastic. Did an emergency rollback on DynamoDB')
@@ -274,7 +276,7 @@ class SnippetManager():
             snippet.id = snippet_raw['id']
         except Exception as parse_error:
             logging.error('There was an error parsing the request body. Error: %s', parse_error)
-            validation.append('There was an error parsing the request body')
+            validation.append('UPDATE : FAIL : USER FETCH')
             # There is no point moving forward from here. Return here
             return snippet, validation
 
@@ -282,10 +284,10 @@ class SnippetManager():
             # Unlike the CREATE method, do NOT assign the token holder as the author. The update
             # might be from a share list member.
             user_details = self.user.get_user_details(token)
-            logging.info('User is : %s', user_details )
+            logging.info('User in the update snippet call is : %s', user_details )
             snippet.author = user_details['data']['user'].email
         except Exception as user_fail:
-            logging.error('There was an error while getting the user details. Error: %s', user_fail)
+            logging.error('UPDATE: There was an exception getting the user. Error: %s', user_fail)
             validation.append('There was an error fetching user information')
 
         try:
@@ -322,15 +324,15 @@ class SnippetManager():
             snippet.uri = const.S3 + snippet.id
         except Exception as uri_fail:
             logging.error('Exception occured while setting the file name and location on S3')
-            logging.error('Full Error: %s', uri_fail)
-            validation.append('Exception while setting the S3 URI')
+            logging.error(ERROR, uri_fail)
+            validation.append(S3_ERROR)
 
         try:
             logging.info('Adding snippet to the S3 location')
             # Storing files with the id of the snippet in S3. This is to prevent write clashes for
             # multiple files with the same name.
             if file_data is not None:
-                f = self._fs.upload_fileobj(file_data,const.BUCKET,snippet.id, ExtraArgs = {
+                self._fs.upload_fileobj(file_data,const.BUCKET,snippet.id, ExtraArgs = {
                     'ContentType': 'text/plain'
                 })
         except Exception as upload_fail:
@@ -372,11 +374,9 @@ class SnippetManager():
             self.update_snippet_shares(shares_old, shares_new, snapshot)
         except Exception as elastic_fail:
             logging.error('There was an exception while adding the snippet to elastic')
-            logging.error('Full Error: %s', elastic_fail)
+            logging.error(ERROR, elastic_fail)
             logging.warn('There are inconsitencies between S3 / Dynamo / Elastic. Please check')
 
-        except Exception as e:
-            logging.error('There was an exception during upload.')
         return snippet, validation
 
     def delete_snippet(self, id, token):
@@ -396,14 +396,14 @@ class SnippetManager():
         except Exception as fetch_fail:
             logging.error('Failed to fetch the existing Snippet from the DB. Error: %s', fetch_fail)
             logging.error('This snippet does not exist or is corrupt to delete')
-            validation.append('This snippet does not exist or is corrupt to delete')
+            validation.append('DELETE : FAIL : USER FETCH')
             return result, validation
 
         try:
             user_details = self.user.get_user_details(token)
-            logging.info('User is : %s', user_details )
+            logging.info('User in the delete snippet call is : %s', user_details )
         except Exception as user_fail:
-            logging.error('There was an error while getting the user details. Error: %s', user_fail)
+            logging.error('DELETE : User fetch fail. Error : %s', user_fail)
             validation.append('There was an error fetching user information')
 
         try:
@@ -411,8 +411,8 @@ class SnippetManager():
             self.fs.delete_object(Bucket=const.BUCKET, Key=result[0].uri)
         except Exception as uri_fail:
             logging.error('Exception occured while removing the file from S3')
-            logging.error('Full Error: %s', uri_fail)
-            validation.append('Exception while setting the S3 URI')
+            logging.error(ERROR, uri_fail)
+            validation.append(S3_ERROR)
 
         try:
             self.table.delete_item(Key={'id': id})
@@ -434,7 +434,7 @@ class SnippetManager():
             )
         except Exception as elastic_fail:
             logging.error('There was an exception while adding deleting the snippet from elastic')
-            logging.error('Full Error: %s', elastic_fail)
+            logging.error(ERROR, elastic_fail)
             logging.warn('There are inconsitencies between S3 / Dynamo / Elastic. Please check')
 
         return result[0], validation

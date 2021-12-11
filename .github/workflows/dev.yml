@@ -8,6 +8,8 @@ on:
       - 'nm3223-sonar'
       - 'tykosc-search'
       - 'authorization-tests-slj2142'
+      - '36-crud-tests-nm3223'
+      - 'main'
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -48,7 +50,7 @@ jobs:
           pip install -r requirements.txt
           python -m unittest discover
           coverage run -m unittest discover
-          coverage html --omit="**/Library/*,*__init__.py" -d test/coverage
+          coverage html --omit="**/Library/*,*__init__.py,home/*,usr/*" -d test/coverage
           echo "Publishing Results to S3"
           python -m src.utilities.coverage_delivery
   sonarcloud:
@@ -75,7 +77,7 @@ jobs:
       - name: Assemble and Deploy
         run: |
           echo "Starting a docker build on ${{ github.ref }} for ${{ github.repository }}"
-          docker build -t nexus:${GITHUB_REF##*/} .
+          docker build --build-arg host=${{ secrets.HOST }} -t nexus:${GITHUB_REF##*/} .
           echo "Build successful. Publishing to ECR"
       - name: Push to ECR
         id: ecr
@@ -84,4 +86,21 @@ jobs:
           access-key-id: ${{ secrets.ACCESS_KEY }}
           secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
           region: us-east-2
-          image: nexus:${GITHUB_REF##*/}  
+          image: nexus:${GITHUB_REF##*/}
+  restart:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Sending signal to re-deploy application on latest branch"
+      - run: curl ${{ secrets.DEPLOY_HOST }}/${GITHUB_REF##*/}
+  postman:
+    needs: [restart]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Newman Action
+        uses: matt-ball/newman-action@v1.0.2
+        with:
+          collection: test/postman/nexus.postman_collection.json
+          environment: test/postman/nexus-config.postman_environment.json
+          delayRequest: 5000

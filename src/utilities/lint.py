@@ -43,7 +43,7 @@ if final_score < threshold:
                Threshold: {threshold} ")
 
     logger.error(message)
-    raise Exception(message)
+    raise ValueError('Threshold does not match')
 
 else:
     message = (f"PyLint Passed | \
