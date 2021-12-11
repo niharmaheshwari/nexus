@@ -8,6 +8,7 @@ on:
       - 'nm3223-sonar'
       - 'tykosc-search'
       - 'authorization-tests-slj2142'
+      - '36-crud-tests-nm3223'
 jobs:
   lint:
     runs-on: ubuntu-latest
